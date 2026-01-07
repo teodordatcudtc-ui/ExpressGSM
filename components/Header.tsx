@@ -4,12 +4,17 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiMenu, FiX, FiPhone, FiTool, FiShoppingBag, FiInfo, FiMail } from 'react-icons/fi'
+import { FiMenu, FiX, FiPhone, FiTool, FiShoppingBag, FiInfo, FiMail, FiShoppingCart } from 'react-icons/fi'
+import { useCartStore } from '@/store/cartStore'
+import Cart from '@/components/Cart'
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
   const pathname = usePathname()
+  const { getItemCount } = useCartStore()
+  const cartItemCount = getItemCount()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,6 +26,7 @@ export default function Header() {
 
   const navItems = [
     { href: '/', label: 'Acasă', icon: FiMenu },
+    { href: '/shop', label: 'Magazin', icon: FiShoppingBag },
     { href: '/servicii', label: 'Servicii', icon: FiTool },
     { href: '/despre-noi', label: 'Despre Noi', icon: FiInfo },
     { href: '/contact', label: 'Contact', icon: FiMail },
@@ -73,16 +79,29 @@ export default function Header() {
               })}
             </nav>
 
-            {/* CTA Button - Desktop */}
-            <motion.a
-              href="tel:0799665665"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="hidden md:flex items-center space-x-2 bg-accent-orange text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <FiPhone className="w-5 h-5" />
-              <span>Sună Acum</span>
-            </motion.a>
+            {/* Cart & CTA Buttons - Desktop */}
+            <div className="hidden md:flex items-center space-x-4">
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-3 text-gray-700 hover:text-primary-600 transition-colors"
+              >
+                <FiShoppingCart className="w-6 h-6" />
+                {cartItemCount > 0 && (
+                  <span className="absolute top-0 right-0 bg-primary-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartItemCount}
+                  </span>
+                )}
+              </button>
+              <motion.a
+                href="tel:0799665665"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center space-x-2 bg-accent-orange text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <FiPhone className="w-5 h-5" />
+                <span>Sună Acum</span>
+              </motion.a>
+            </div>
 
             {/* Mobile Menu Button */}
             <button
@@ -123,9 +142,19 @@ export default function Header() {
                     </Link>
                   )
                 })}
+                <button
+                  onClick={() => {
+                    setIsCartOpen(true)
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="flex items-center justify-center space-x-2 bg-primary-600 text-white px-4 py-3 rounded-lg font-semibold mt-4 w-full relative"
+                >
+                  <FiShoppingCart className="w-5 h-5" />
+                  <span>Coș ({cartItemCount})</span>
+                </button>
                 <a
                   href="tel:0799665665"
-                  className="flex items-center justify-center space-x-2 bg-accent-orange text-white px-4 py-3 rounded-lg font-semibold mt-4"
+                  className="flex items-center justify-center space-x-2 bg-accent-orange text-white px-4 py-3 rounded-lg font-semibold mt-2"
                 >
                   <FiPhone className="w-5 h-5" />
                   <span>Sună: 0799665665</span>
@@ -138,6 +167,9 @@ export default function Header() {
 
       {/* Spacer for fixed header */}
       <div className="h-20" />
+
+      {/* Cart Component */}
+      <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   )
 }

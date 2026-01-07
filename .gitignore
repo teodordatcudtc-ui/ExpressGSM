@@ -35,3 +35,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# database
+/data
+*.db
+*.sqlite
+*.sqlite3
+
+# uploads
+/public/uploads
+

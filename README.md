@@ -10,6 +10,11 @@ Site web modern și profesional pentru service GSM, construit cu Next.js 14, Rea
 - **Performanță**: Viteza de încărcare optimizată cu Next.js
 - **Animații Smooth**: Micro-animații și tranziții folosind Framer Motion
 - **Formular de Contact**: Validare live cu react-hook-form
+- **🛒 Magazin Online**: Sistem complet de e-commerce cu categorii de produse
+- **🛍️ Coș de Cumpărături**: Coș persistent cu gestionare cantități
+- **💳 Checkout**: Formular de checkout complet cu validare
+- **📦 Dashboard Admin**: Panou administrativ pentru gestionarea produselor și comenzilor
+- **💾 Baza de Date SQLite**: Sistem de stocare locală pentru produse, categorii și comenzi
 
 ## 📋 Cerințe
 
@@ -111,14 +116,24 @@ Site-ul poate fi deployat pe orice platformă care suportă Next.js:
 express-gsm-network/
 ├── app/                    # Next.js App Router
 │   ├── page.tsx           # Pagina principală (Home)
+│   ├── shop/              # Pagina Magazin
+│   ├── checkout/          # Pagina Checkout
+│   ├── admin/             # Dashboard Admin
+│   │   └── orders/        # Detalii comenzi
+│   ├── api/               # API Routes
+│   │   ├── categories/    # API categorii
+│   │   ├── products/      # API produse
+│   │   ├── orders/        # API comenzi
+│   │   └── admin/         # API admin
 │   ├── servicii/          # Pagina Servicii
 │   ├── despre-noi/        # Pagina Despre Noi
 │   ├── contact/           # Pagina Contact
 │   ├── layout.tsx         # Layout principal
 │   └── globals.css        # Stiluri globale
 ├── components/            # Componente reutilizabile
-│   ├── Header.tsx         # Header cu navigare
+│   ├── Header.tsx         # Header cu navigare și coș
 │   ├── Footer.tsx         # Footer
+│   ├── Cart.tsx           # Componentă coș de cumpărături
 │   ├── Hero.tsx           # Hero section
 │   ├── ServicesSection.tsx
 │   ├── ServicesDetail.tsx
@@ -127,7 +142,13 @@ express-gsm-network/
 │   ├── ContactForm.tsx    # Formular contact
 │   ├── AboutUs.tsx        # Pagina Despre Noi
 │   └── CTA.tsx            # Call-to-action
-├── public/                # Fișiere statice (dacă există)
+├── lib/                   # Utilitare și configurații
+│   └── db.ts              # Configurare baza de date SQLite
+├── store/                 # State management
+│   └── cartStore.ts       # Store pentru coș de cumpărături
+├── data/                  # Baza de date SQLite (generată automat)
+│   └── shop.db            # Fișier baza de date
+├── public/                # Fișiere statice
 ├── package.json
 ├── tailwind.config.js
 ├── tsconfig.json
@@ -173,12 +194,34 @@ colors: {
 - **Framer Motion**: Biblioteca pentru animații
 - **React Hook Form**: Gestionare formulare
 - **React Icons**: Iconițe
+- **Better-SQLite3**: Baza de date SQLite pentru Node.js
+- **Zustand**: Gestionare state pentru coș de cumpărături
+
+## 🛒 Funcționalități Magazin
+
+### Pentru Clienți
+- **Magazin cu Categorii**: Navigare prin categorii de produse (Ecrane, Baterii, Accesorii, Reparații)
+- **Coș de Cumpărături**: Adăugare produse în coș, modificare cantități, ștergere produse
+- **Checkout**: Formular complet de checkout cu validare date client
+- **Procesare Comenzi**: Sistem funcțional de procesare comenzi (fără integrare plată externă)
+
+### Pentru Admin
+- **Dashboard Admin**: Acces la `/admin` pentru gestionarea produselor și comenzilor
+- **Gestionare Produse**: Adăugare, editare, ștergere produse cu categorii, prețuri, stoc
+- **Gestionare Comenzi**: Vizualizare comenzi, actualizare status, gestionare stoc
+
+### Baza de Date
+- **SQLite**: Baza de date este creată automat în directorul `data/shop.db`
+- **Tabele**: Categorii, Produse, Comenzi, Items Comenzi
+- **Inițializare**: Baza de date se inițializează automat cu categorii default la prima rulare
 
 ## 📝 Note
 
 - Formularul de contact este configurat pentru simulare. Pentru funcționalitate completă, conectează-l la un serviciu de email (ex: SendGrid, Resend) sau un backend API.
 - Hartă Google Maps este embedded și funcționează direct.
 - Toate paginile sunt optimizate pentru SEO cu metadata corespunzătoare.
+- **Plata**: Sistemul de comenzi funcționează complet, dar plata se presupune a fi efectuată la livrare (ramburs). Nu există integrare cu procesatori de plată externi.
+- **Baza de Date**: Fișierul `data/shop.db` este generat automat și nu trebuie inclus în git (este deja în `.gitignore`).
 
 ## 🐛 Troubleshooting
 

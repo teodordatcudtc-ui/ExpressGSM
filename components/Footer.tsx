@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FiPhone, FiMapPin, FiMail, FiFacebook, FiInstagram, FiClock } from 'react-icons/fi'
+import { FiPhone, FiMapPin, FiMail, FiFacebook, FiInstagram, FiClock, FiLock } from 'react-icons/fi'
 
 export default function Footer() {
   return (
@@ -36,6 +36,17 @@ export default function Footer() {
               <li>
                 <Link href="/contact" className="hover:text-primary-400 transition-colors">
                   Contact
+                </Link>
+              </li>
+              <li>
+                <Link href="/shop" className="hover:text-primary-400 transition-colors">
+                  Magazin
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/login" className="hover:text-primary-400 transition-colors flex items-center gap-1">
+                  <FiLock className="w-4 h-4" />
+                  Admin
                 </Link>
               </li>
             </ul>
