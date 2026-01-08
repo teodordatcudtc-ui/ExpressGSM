@@ -209,7 +209,7 @@ export default function ShopPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -5 }}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all flex flex-col"
                 >
                   {/* Product Image - Clickable */}
                   <Link href={`/shop/${product.slug}`}>
@@ -234,7 +234,7 @@ export default function ShopPage() {
                   </Link>
 
                   {/* Product Info */}
-                  <div className="p-4">
+                  <div className="p-4 flex flex-col flex-grow">
                     <p className="text-sm text-gray-500 mb-1">{product.category_name}</p>
                     <Link href={`/shop/${product.slug}`}>
                       <h3 className="text-lg font-bold text-gray-900 mb-2 hover:text-primary-600 transition-colors cursor-pointer">
@@ -242,9 +242,11 @@ export default function ShopPage() {
                       </h3>
                     </Link>
                     {product.description && (
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-2 flex-grow">
+                        {product.description}
+                      </p>
                     )}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-auto">
                       <span className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {product.stock > 0 ? `În stoc (${product.stock})` : 'Stoc epuizat'}
                       </span>

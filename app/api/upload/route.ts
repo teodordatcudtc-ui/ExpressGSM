@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
-import { existsSync } from 'fs'
+import { supabase } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,31 +22,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File too large. Maximum size is 5MB.' }, { status: 400 })
     }
 
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
     // Generate unique filename
     const timestamp = Date.now()
     const randomString = Math.random().toString(36).substring(2, 15)
-    const extension = path.extname(file.name)
-    const filename = `${timestamp}-${randomString}${extension}`
+    const extension = file.name.split('.').pop() || 'jpg'
+    const filename = `${timestamp}-${randomString}.${extension}`
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'products')
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true })
+    // Convert file to buffer
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('products')
+      .upload(filename, buffer, {
+        contentType: file.type,
+        upsert: false,
+      })
+
+    if (error) {
+      console.error('Supabase storage error:', error)
+      return NextResponse.json({ error: 'Failed to upload file to storage', details: error.message }, { status: 500 })
     }
 
-    // Save file
-    const filepath = path.join(uploadsDir, filename)
-    await writeFile(filepath, buffer)
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('products')
+      .getPublicUrl(filename)
 
-    // Return URL path
-    const url = `/uploads/products/${filename}`
-    return NextResponse.json({ url })
-  } catch (error) {
+    return NextResponse.json({ url: urlData.publicUrl })
+  } catch (error: any) {
     console.error('Error uploading file:', error)
-    return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to upload file', details: error.message }, { status: 500 })
   }
 }
-
