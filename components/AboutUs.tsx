@@ -48,7 +48,7 @@ export default function AboutUs() {
           className="text-center mb-16"
         >
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            Despre <span className="text-primary-600">Express GSM Network</span>
+            Despre <span className="text-primary-600">ecranul.ro</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Suntem un service GSM profesional din București, dedicat oferirii 
@@ -70,7 +70,7 @@ export default function AboutUs() {
             </h2>
             <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
               <p>
-                Express GSM Network a fost înființat cu misiunea de a oferi servicii 
+                ecranul.ro a fost înființat cu misiunea de a oferi servicii 
                 GSM profesionale și accesibile în București. Cu o pasiune pentru tehnologie 
                 și un angajament ferm față de calitate, am construit o afacere bazată pe 
                 încredere și satisfacția clienților.

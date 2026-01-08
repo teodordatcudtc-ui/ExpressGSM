@@ -1,28 +1,34 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 
-// This endpoint removes the Reparații category and all its products
 export async function POST() {
   try {
-    const reparatiiCategory = db.prepare('SELECT id FROM categories WHERE slug = ?').get('reparatii') as { id: number } | undefined
+    const categories = await db.getWhere('categories', { slug: 'reparatii' })
     
-    if (!reparatiiCategory) {
+    if (categories.length === 0) {
       return NextResponse.json({ message: 'Reparații category not found' })
     }
 
+    const reparatiiCategory = categories[0]
+
     // Delete products in this category
-    const deletedProducts = db.prepare('DELETE FROM products WHERE category_id = ?').run(reparatiiCategory.id)
+    const products = await db.getWhere('products', { category_id: reparatiiCategory.id })
+    let deletedProducts = 0
+    
+    for (const product of products) {
+      await db.delete('products', product.id)
+      deletedProducts++
+    }
     
     // Delete the category
-    db.prepare('DELETE FROM categories WHERE id = ?').run(reparatiiCategory.id)
+    await db.delete('categories', reparatiiCategory.id)
 
     return NextResponse.json({ 
       message: 'Reparații category removed',
-      deletedProducts: deletedProducts.changes 
+      deletedProducts
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error removing Reparații category:', error)
-    return NextResponse.json({ error: 'Failed to remove category' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to remove category', details: error.message }, { status: 500 })
   }
 }
-

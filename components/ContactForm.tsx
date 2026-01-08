@@ -93,8 +93,8 @@ export default function ContactForm() {
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Adresă</h3>
                   <p className="text-gray-700">
-                    Bulevardul Bucureștii Noi 50a<br />
-                    București 013152
+                    Strada Pajurei 7<br />
+                    București
                   </p>
                 </div>
               </div>
@@ -105,7 +105,7 @@ export default function ContactForm() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                  <p className="text-gray-700">contact@expressgsm.ro</p>
+                  <p className="text-gray-700">contact@ecranul.ro</p>
                   <p className="text-gray-500 text-sm mt-1">Răspundem în 24 de ore</p>
                 </div>
               </div>

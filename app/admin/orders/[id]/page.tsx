@@ -60,10 +60,16 @@ export default function OrderDetailPage() {
         }),
       })
       if (res.ok) {
-        fetchOrder()
+        await fetchOrder()
+        // Show success message
+        alert(`Comanda a fost actualizată: ${status === 'completed' ? 'Finalizată' : 'În procesare'}`)
+      } else {
+        const error = await res.json()
+        alert(`Eroare: ${error.error || 'Nu s-a putut actualiza comanda'}`)
       }
     } catch (error) {
       console.error('Error updating order:', error)
+      alert('Eroare la actualizarea comenzii')
     }
   }
 
@@ -88,7 +94,10 @@ export default function OrderDetailPage() {
       <div className="section-padding bg-gray-50 min-h-screen">
       <div className="container-custom max-w-4xl">
         <button
-          onClick={() => router.back()}
+          onClick={() => {
+            // Refresh orders list when going back
+            router.push('/admin?tab=orders')
+          }}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
         >
           <FiArrowLeft className="w-5 h-5" />

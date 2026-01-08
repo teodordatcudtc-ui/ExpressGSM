@@ -13,6 +13,9 @@ interface Category {
   name: string
   slug: string
   description?: string
+  parent_id?: number | null
+  parent_name?: string
+  parent_slug?: string
 }
 
 interface Product {
@@ -29,8 +32,10 @@ interface Product {
 
 export default function ShopPage() {
   const [categories, setCategories] = useState<Category[]>([])
+  const [subcategories, setSubcategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
+  const [selectedSubcategory, setSelectedSubcategory] = useState<number | null>(null)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const { addItem, getItemCount } = useCartStore()
 
@@ -40,8 +45,35 @@ export default function ShopPage() {
   }, [])
 
   useEffect(() => {
-    fetchProducts(selectedCategory || undefined)
-  }, [selectedCategory])
+    // When a category is selected, check if it has subcategories
+    if (selectedCategory && categories && categories.length > 0) {
+      const category = categories.find((c: Category) => c.id === selectedCategory)
+      const subs = categories.filter((c: Category) => c.parent_id === selectedCategory)
+      setSubcategories(subs)
+      setSelectedSubcategory(null) // Reset subcategory when changing main category
+      
+      // If category has subcategories, don't fetch products yet
+      // Otherwise, fetch products for the category
+      if (subs.length === 0) {
+        fetchProducts(selectedCategory, false)
+      } else {
+        setProducts([]) // Clear products when showing subcategories
+      }
+    } else {
+      setSubcategories([])
+      setSelectedSubcategory(null)
+      if (!selectedCategory) {
+        fetchProducts()
+      }
+    }
+  }, [selectedCategory, categories])
+
+  useEffect(() => {
+    // Fetch products when subcategory is selected
+    if (selectedSubcategory) {
+      fetchProducts(selectedSubcategory, false)
+    }
+  }, [selectedSubcategory])
 
   const fetchCategories = async () => {
     try {
@@ -53,16 +85,18 @@ export default function ShopPage() {
     }
   }
 
-  const fetchProducts = async (categoryId?: number) => {
+  const fetchProducts = async (categoryId?: number, includeSubcategories: boolean = true) => {
     try {
       const url = categoryId
-        ? `/api/products?categoryId=${categoryId}`
+        ? `/api/products?categoryId=${categoryId}&includeSubcategories=${includeSubcategories}`
         : '/api/products'
       const res = await fetch(url)
       const data = await res.json()
-      setProducts(data)
+      // Ensure products is always an array
+      setProducts(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error fetching products:', error)
+      setProducts([]) // Set empty array on error
     }
   }
 
@@ -95,41 +129,80 @@ export default function ShopPage() {
           </motion.div>
 
           {/* Categories Filter */}
-          <div className="mb-8 flex flex-wrap gap-3 justify-center">
-            <button
-              onClick={() => setSelectedCategory(null)}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-                selectedCategory === null
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Toate Categoriile
-            </button>
-            {categories.map((category) => (
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-3 justify-center mb-4">
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
+                onClick={() => {
+                  setSelectedCategory(null)
+                  setSelectedSubcategory(null)
+                }}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-                  selectedCategory === category.id
+                  selectedCategory === null
                     ? 'bg-primary-600 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                {category.name}
+                Toate Categoriile
               </button>
-            ))}
+              {categories && categories.length > 0 && categories
+                .filter((c: Category) => !c.parent_id)
+                .map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+                      selectedCategory === category.id
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+            </div>
+            
+            {/* Subcategories Filter (only show if category has subcategories) */}
+            {subcategories.length > 0 && (
+              <div className="flex flex-wrap gap-3 justify-center">
+                <button
+                  onClick={() => {
+                    setSelectedSubcategory(null)
+                    fetchProducts(selectedCategory!, true)
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    selectedSubcategory === null
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Toate {categories.find(c => c.id === selectedCategory)?.name}
+                </button>
+                {subcategories.map((subcategory) => (
+                  <button
+                    key={subcategory.id}
+                    onClick={() => setSelectedSubcategory(subcategory.id)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                      selectedSubcategory === subcategory.id
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {subcategory.name}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Products Grid */}
-          {products.length === 0 ? (
+          {!products || !Array.isArray(products) || products.length === 0 ? (
             <div className="text-center py-12">
               <FiShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">Nu există produse în această categorie</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product, index) => (
+              {products.map((product: Product, index: number) => (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 30 }}

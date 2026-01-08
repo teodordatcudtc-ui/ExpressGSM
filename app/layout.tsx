@@ -7,12 +7,12 @@ import Footer from '@/components/Footer'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Express GSM Network - Reparații Telefoane & Accesorii București',
-  description: 'Service GSM profesional în București. Reparații telefoane, vânzări accesorii, ecrane, baterii. Servicii rapide și de calitate la Bulevardul Bucureștii Noi 50a.',
-  keywords: 'reparații telefoane București, service GSM, accesorii telefoane, ecrane telefoane, baterii telefoane, Express GSM Network',
-  authors: [{ name: 'Express GSM Network' }],
+  title: 'ecranul.ro - Reparații Telefoane & Accesorii București',
+  description: 'Service GSM profesional în București. Reparații telefoane, vânzări accesorii, ecrane, baterii. Servicii rapide și de calitate la Strada Pajurei 7, București.',
+  keywords: 'reparații telefoane București, service GSM, accesorii telefoane, ecrane telefoane, baterii telefoane, ecranul.ro',
+  authors: [{ name: 'ecranul.ro' }],
   openGraph: {
-    title: 'Express GSM Network - Service GSM București',
+    title: 'ecranul.ro - Service GSM București',
     description: 'Reparații telefoane profesionale și accesorii GSM în București',
     type: 'website',
     locale: 'ro_RO',

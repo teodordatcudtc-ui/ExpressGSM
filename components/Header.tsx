@@ -53,7 +53,7 @@ export default function Header() {
                 <FiPhone className="text-white text-xl" />
               </motion.div>
               <span className="text-2xl font-bold text-primary-600 group-hover:text-primary-700 transition-colors">
-                Express GSM
+                ecranul.ro
               </span>
             </Link>
 

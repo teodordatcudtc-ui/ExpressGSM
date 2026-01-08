@@ -53,8 +53,8 @@ export default function LocationMap() {
                 <div>
                   <h4 className="font-semibold mb-1">Adresă</h4>
                   <p className="text-white/90">
-                    Bulevardul Bucureștii Noi 50a<br />
-                    București 013152
+                    Strada Pajurei 7<br />
+                    București
                   </p>
                 </div>
               </div>
@@ -93,7 +93,7 @@ export default function LocationMap() {
             className="rounded-2xl overflow-hidden shadow-xl"
           >
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2846.680212723934!2d26.03883929678955!3d44.480727300000005!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b20308f1c15c63%3A0x8dff8f37ec1047ba!2sExpress%20Gsm%20Network!5e0!3m2!1sen!2sro!4v1767618322906!5m2!1sen!2sro"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2846.612322319521!2d26.042321091094625!3d44.482118723854285!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b203b5ff25f8eb%3A0xe0a1f90be7d45268!2sStrada%20Pajurei%207%2C%20Bucure%C8%99ti%20013152!5e0!3m2!1sen!2sro!4v1767856405702!5m2!1sen!2sro"
               width="100%"
               height="100%"
               style={{ border: 0, minHeight: '400px' }}

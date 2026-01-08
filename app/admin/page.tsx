@@ -12,6 +12,8 @@ interface Category {
   id: number
   name: string
   slug: string
+  parent_id?: number | null
+  parent_name?: string
 }
 
 interface Product {
@@ -65,15 +67,26 @@ function AdminDashboardContent() {
     fetchProducts()
     fetchOrders()
     fetchCategories()
-  }, [])
+    
+    // Refresh orders every 5 seconds to see status updates
+    const interval = setInterval(() => {
+      if (activeTab === 'orders') {
+        fetchOrders()
+      }
+    }, 5000)
+    
+    return () => clearInterval(interval)
+  }, [activeTab])
 
   const fetchProducts = async () => {
     try {
       const res = await fetch('/api/products?active=false')
       const data = await res.json()
-      setProducts(data)
+      // Ensure products is always an array
+      setProducts(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error fetching products:', error)
+      setProducts([]) // Set empty array on error
     }
   }
 
@@ -90,10 +103,20 @@ function AdminDashboardContent() {
   const fetchCategories = async () => {
     try {
       const res = await fetch('/api/categories')
+      if (!res.ok) {
+        console.error('Failed to fetch categories:', res.status, res.statusText)
+        setCategories([])
+        return
+      }
       const data = await res.json()
-      setCategories(data)
+      console.log('Categories fetched:', data) // Debug log
+      // Ensure categories is always an array
+      const categoriesArray = Array.isArray(data) ? data : []
+      setCategories(categoriesArray)
+      console.log('Categories set:', categoriesArray.length, 'categories') // Debug log
     } catch (error) {
       console.error('Error fetching categories:', error)
+      setCategories([]) // Set empty array on error
     }
   }
 
@@ -405,11 +428,28 @@ function AdminDashboardContent() {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
                       >
                         <option value="">Selectează categorie</option>
-                        {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </option>
-                        ))}
+                        {categories && Array.isArray(categories) && categories.length > 0 ? (
+                          categories
+                            .filter((c: Category) => !c.parent_id)
+                            .map((category) => {
+                              const subcategories = categories.filter((c: Category) => c.parent_id === category.id)
+                              return (
+                                <optgroup key={category.id} label={category.name}>
+                                  {subcategories.length > 0 ? (
+                                    subcategories.map((sub) => (
+                                      <option key={sub.id} value={sub.id}>
+                                        {sub.name}
+                                      </option>
+                                    ))
+                                  ) : (
+                                    <option value={category.id}>{category.name}</option>
+                                  )}
+                                </optgroup>
+                              )
+                            })
+                        ) : (
+                          <option value="" disabled>Se încarcă categoriile...</option>
+                        )}
                       </select>
                     </div>
                     <div>
@@ -511,7 +551,7 @@ function AdminDashboardContent() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {products.map((product) => (
+                  {products && Array.isArray(products) && products.map((product) => (
                     <tr key={product.id} className={`hover:bg-gray-50 ${product.active === 0 ? 'opacity-60 bg-gray-50' : ''}`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
+import { supabase } from '@/lib/supabase'
 
 export async function GET(request: Request) {
   try {
@@ -7,55 +8,94 @@ export async function GET(request: Request) {
     const categoryId = searchParams.get('categoryId')
     const slug = searchParams.get('slug')
     const active = searchParams.get('active') !== 'false'
+    const includeSubcategories = searchParams.get('includeSubcategories') === 'true'
 
-    let query = 'SELECT p.*, c.name as category_name, c.slug as category_slug FROM products p JOIN categories c ON p.category_id = c.id WHERE 1=1'
-    const params: any[] = []
+    let query = supabase
+      .from('products')
+      .select(`
+        *,
+        categories (*)
+      `)
 
     if (slug) {
-      query += ' AND p.slug = ?'
-      params.push(slug)
+      query = query.eq('slug', slug)
     } else if (categoryId) {
-      query += ' AND p.category_id = ?'
-      params.push(categoryId)
+      if (includeSubcategories) {
+        // Get subcategories
+        const { data: subcats } = await supabase
+          .from('categories')
+          .select('id')
+          .eq('parent_id', parseInt(categoryId))
+        
+        const subcatIds = subcats?.map(c => c.id) || []
+        query = query.in('category_id', [parseInt(categoryId), ...subcatIds])
+      } else {
+        query = query.eq('category_id', parseInt(categoryId))
+      }
     }
 
     if (active) {
-      query += ' AND p.active = 1'
+      query = query.eq('active', 1)
     }
 
-    query += ' ORDER BY p.created_at DESC'
+    query = query.order('created_at', { ascending: false })
 
-    const products = db.prepare(query).all(...params)
+    const { data, error } = await query
+
+    if (error) throw error
+
+    // Transform to match expected format
+    const products = (data || []).map((product: any) => {
+      const category = product.categories
+      return {
+        ...product,
+        category_name: category?.name,
+        category_slug: category?.slug,
+        category_parent_id: category?.parent_id,
+      }
+    })
+
     return NextResponse.json(products)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching products:', error)
-    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch products', details: error.message }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, slug, description, price, image, category_id, stock } = body
+    const { name, slug, description, price, image, category_id, stock, active } = body
 
     if (!name || !slug || !price || !category_id) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const result = db.prepare(`
-      INSERT INTO products (name, slug, description, price, image, category_id, stock)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(name, slug, description || '', price, image || '', category_id, stock || 0)
+    const productData = {
+      name,
+      slug,
+      description: description || null,
+      price: parseFloat(price),
+      image: image || null,
+      category_id: parseInt(category_id),
+      stock: parseInt(stock) || 0,
+      active: active !== undefined ? (active ? 1 : 0) : 1,
+    }
 
-    const product = db.prepare('SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.id = ?').get(result.lastInsertRowid)
+    const product = await db.insert('products', productData)
 
-    return NextResponse.json(product, { status: 201 })
+    // Get category name
+    const category = await db.getById('categories', product.category_id)
+
+    return NextResponse.json({
+      ...product,
+      category_name: category.name,
+    }, { status: 201 })
   } catch (error: any) {
     console.error('Error creating product:', error)
-    if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+    if (error.code === '23505') {
       return NextResponse.json({ error: 'Product with this slug already exists' }, { status: 400 })
     }
-    return NextResponse.json({ error: 'Failed to create product' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create product', details: error.message }, { status: 500 })
   }
 }
-

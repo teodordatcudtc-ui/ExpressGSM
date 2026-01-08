@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { FiCheckCircle, FiShoppingCart, FiUser, FiMail, FiPhone, FiMapPin } from 'react-icons/fi'
+import { FiCheckCircle, FiShoppingCart, FiUser, FiMail, FiPhone, FiMapPin, FiX } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
 
 interface CheckoutForm {
@@ -16,7 +16,7 @@ interface CheckoutForm {
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, getTotal, clearCart } = useCartStore()
+  const { items, getTotal, clearCart, removeItem } = useCartStore()
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
@@ -236,14 +236,23 @@ export default function CheckoutPage() {
 
               <div className="space-y-4 mb-6">
                 {items.map((item) => (
-                  <div key={item.product_id} className="flex justify-between items-start pb-4 border-b">
+                  <div key={item.product_id} className="flex justify-between items-start pb-4 border-b group">
                     <div className="flex-1">
                       <p className="font-semibold text-gray-900">{item.product_name}</p>
                       <p className="text-sm text-gray-600">Cantitate: {item.quantity}</p>
                     </div>
-                    <p className="font-bold text-primary-600">
-                      {(item.price * item.quantity).toFixed(2)} RON
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <p className="font-bold text-primary-600">
+                        {(item.price * item.quantity).toFixed(2)} RON
+                      </p>
+                      <button
+                        onClick={() => removeItem(item.product_id)}
+                        className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Șterge din coș"
+                      >
+                        <FiX className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

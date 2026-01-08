@@ -3,19 +3,23 @@ import db from '@/lib/db'
 
 export async function GET() {
   try {
-    const orders = db.prepare(`
-      SELECT o.*, 
-        COUNT(oi.id) as item_count
-      FROM orders o
-      LEFT JOIN order_items oi ON o.id = oi.order_id
-      GROUP BY o.id
-      ORDER BY o.created_at DESC
-    `).all()
+    const orders = await db.getAll('orders', 'created_at DESC')
+    
+    // Get item counts for each order
+    const ordersWithCounts = await Promise.all(
+      orders.map(async (order: any) => {
+        const count = await db.count('order_items', { order_id: order.id })
+        return {
+          ...order,
+          item_count: count,
+        }
+      })
+    )
 
-    return NextResponse.json(orders)
-  } catch (error) {
+    return NextResponse.json(ordersWithCounts)
+  } catch (error: any) {
     console.error('Error fetching orders:', error)
-    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch orders', details: error.message }, { status: 500 })
   }
 }
 
@@ -31,41 +35,39 @@ export async function POST(request: Request) {
     // Generate order number
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
 
-    const insertOrder = db.transaction(() => {
-      // Insert order
-      const orderResult = db.prepare(`
-        INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, customer_address, total_amount)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `).run(orderNumber, customer_name, customer_email, customer_phone, customer_address, total_amount)
-
-      const orderId = orderResult.lastInsertRowid
-
-      // Insert order items
-      const insertItem = db.prepare(`
-        INSERT INTO order_items (order_id, product_id, product_name, quantity, price)
-        VALUES (?, ?, ?, ?, ?)
-      `)
-
-      for (const item of items) {
-        insertItem.run(orderId, item.product_id, item.product_name, item.quantity, item.price)
-        
-        // Update stock
-        db.prepare('UPDATE products SET stock = stock - ? WHERE id = ?').run(item.quantity, item.product_id)
-      }
-
-      return orderId
+    // Insert order
+    const order = await db.insert('orders', {
+      order_number: orderNumber,
+      customer_name,
+      customer_email,
+      customer_phone,
+      customer_address,
+      total_amount: parseFloat(total_amount),
     })
 
-    const orderId = insertOrder()
+    // Insert order items and update stock
+    for (const item of items) {
+      await db.insert('order_items', {
+        order_id: order.id,
+        product_id: item.product_id,
+        product_name: item.product_name,
+        quantity: item.quantity,
+        price: parseFloat(item.price),
+      })
+      
+      // Update stock
+      const product = await db.getById('products', item.product_id)
+      await db.update('products', item.product_id, {
+        stock: (product.stock || 0) - item.quantity
+      })
+    }
 
-    // Fetch complete order
-    const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(orderId) as any
-    const orderItems = db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(orderId)
+    // Get order items
+    const orderItems = await db.getWhere('order_items', { order_id: order.id })
 
     return NextResponse.json({ ...order, items: orderItems }, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating order:', error)
-    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create order', details: error.message }, { status: 500 })
   }
 }
-

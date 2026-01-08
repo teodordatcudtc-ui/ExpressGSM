@@ -13,12 +13,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all data from the table
-    const data = db.prepare(`SELECT * FROM ${tableName} ORDER BY id DESC`).all()
+    const data = await db.getAll(tableName, 'id DESC')
 
     return NextResponse.json(data)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching table data:', error)
-    return NextResponse.json({ error: 'Failed to fetch table data' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch table data', details: error.message }, { status: 500 })
   }
 }
-

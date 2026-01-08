@@ -3,20 +3,19 @@ import db from '@/lib/db'
 
 export async function GET() {
   try {
-    const categoriesCount = db.prepare('SELECT COUNT(*) as count FROM categories').get() as { count: number }
-    const productsCount = db.prepare('SELECT COUNT(*) as count FROM products').get() as { count: number }
-    const ordersCount = db.prepare('SELECT COUNT(*) as count FROM orders').get() as { count: number }
-    const orderItemsCount = db.prepare('SELECT COUNT(*) as count FROM order_items').get() as { count: number }
+    const categories = await db.count('categories')
+    const products = await db.count('products')
+    const orders = await db.count('orders')
+    const orderItems = await db.count('order_items')
 
     return NextResponse.json({
-      categories: categoriesCount.count,
-      products: productsCount.count,
-      orders: ordersCount.count,
-      orderItems: orderItemsCount.count,
+      categories,
+      products,
+      orders,
+      orderItems,
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching database stats:', error)
-    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch stats', details: error.message }, { status: 500 })
   }
 }
-

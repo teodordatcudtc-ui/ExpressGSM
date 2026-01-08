@@ -68,9 +68,7 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg"
           >
-            <span className="text-white">Express GSM</span>
-            <br />
-            <span className="text-primary-200">Network</span>
+            <span className="text-white">ecranul</span><span className="text-primary-200">.ro</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -96,20 +94,19 @@ export default function Hero() {
               href="tel:0799665665"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="btn-primary flex items-center space-x-2 text-lg px-8 py-4"
+              className="btn-primary flex items-center justify-center space-x-2 text-lg px-8 py-4 w-[240px]"
             >
               <FiPhone className="w-5 h-5" />
-              <span>Sună Acum: 0799665665</span>
+              <span>Sună Acum</span>
             </motion.a>
             <motion.a
               href="/servicii"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="btn-secondary flex items-center space-x-2 text-lg px-8 py-4"
+              className="btn-secondary flex items-center justify-center space-x-2 text-lg px-8 py-4 w-[240px] whitespace-nowrap"
             >
               <FiTool className="w-5 h-5" />
               <span>Vezi Serviciile</span>
-              <FiArrowRight className="w-5 h-5" />
             </motion.a>
           </motion.div>
 

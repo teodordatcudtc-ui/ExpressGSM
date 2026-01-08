@@ -1,4 +1,4 @@
-# Express GSM Network - Website
+# ecranul.ro - Website
 
 Site web modern și profesional pentru service GSM, construit cu Next.js 14, React, TypeScript și Tailwind CSS.
 
@@ -182,7 +182,7 @@ colors: {
 ## 📱 Informații de Contact
 
 - **Telefon**: 0799665665
-- **Adresă**: Bulevardul Bucureștii Noi 50a, București 013152
+- **Adresă**: Strada Pajurei 7, București
 - **Program**: Luni-Vineri: 09:00-19:00, Sâmbătă: 09:00-17:00
 
 ## 🔧 Tehnologii Utilizate
@@ -237,9 +237,9 @@ Dacă portul 3000 este ocupat, Next.js va folosi automat următorul port disponi
 
 ## 📄 Licență
 
-Acest proiect este proprietate privată a Express GSM Network.
+Acest proiect este proprietate privată a ecranul.ro.
 
 ---
 
-**Dezvoltat cu ❤️ pentru Express GSM Network**
+**Dezvoltat cu ❤️ pentru ecranul.ro**
 

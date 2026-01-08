@@ -4,13 +4,7 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com'],
   },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = config.externals || []
-      config.externals.push('better-sqlite3')
-    }
-    return config
-  },
+  // Supabase is used as the database, no webpack externals needed
 }
 
 module.exports = nextConfig

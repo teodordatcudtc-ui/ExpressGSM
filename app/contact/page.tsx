@@ -3,9 +3,9 @@ import ContactForm from '@/components/ContactForm'
 import LocationMap from '@/components/LocationMap'
 
 export const metadata: Metadata = {
-  title: 'Contact - Express GSM Network | Programează o Reparație București',
-  description: 'Contactează Express GSM Network pentru reparații telefoane, accesorii sau consultanță. Telefon: 0799665665. Adresă: Bulevardul Bucureștii Noi 50a, București.',
-  keywords: 'contact Express GSM Network, programare reparație telefon, service GSM București, telefon service GSM',
+  title: 'Contact - ecranul.ro | Programează o Reparație București',
+  description: 'Contactează ecranul.ro pentru reparații telefoane, accesorii sau consultanță. Telefon: 0799665665. Adresă: Strada Pajurei 7, București.',
+  keywords: 'contact ecranul.ro, programare reparație telefon, service GSM București, telefon service GSM',
 }
 
 export default function ContactPage() {
