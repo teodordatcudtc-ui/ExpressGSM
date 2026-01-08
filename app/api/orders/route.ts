@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
+import { sendOrderConfirmationEmail } from '@/lib/email'
 
 export async function GET() {
   try {
@@ -64,6 +65,31 @@ export async function POST(request: Request) {
 
     // Get order items
     const orderItems = await db.getWhere('order_items', { order_id: order.id })
+
+    // Send confirmation email (don't wait for it, send in background)
+    sendOrderConfirmationEmail({
+      orderNumber: order.order_number,
+      customerName: customer_name,
+      customerEmail: customer_email,
+      customerPhone: customer_phone,
+      customerAddress: customer_address,
+      items: orderItems.map((item: any) => ({
+        product_name: item.product_name,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      totalAmount: parseFloat(total_amount),
+      orderDate: new Date(order.created_at).toLocaleDateString('ro-RO', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    }).catch((error) => {
+      // Log error but don't fail the order
+      console.error('Failed to send confirmation email:', error)
+    })
 
     return NextResponse.json({ ...order, items: orderItems }, { status: 201 })
   } catch (error: any) {
