@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Hero from '@/components/Hero'
-import ProductCarousel from '@/components/ProductCarousel'
+import ShopSection from '@/components/ShopSection'
 import ServicesSection from '@/components/ServicesSection'
 import Testimonials from '@/components/Testimonials'
 import LocationMap from '@/components/LocationMap'
@@ -22,7 +22,7 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <ProductCarousel />
+      <ShopSection />
       <ServicesSection />
       <CTA />
       <Testimonials />
