@@ -55,7 +55,7 @@ export default function ShopSection() {
     scrollContainer.scrollLeft = 0
 
     let scrollPosition = 0
-    const scrollSpeed = 1.5 // Increased speed for faster movement
+    const scrollSpeed = 0.3 // Reduced speed for slower movement
     let animationFrameId: number | null = null
     let isPaused = false
     let pauseTimeout: NodeJS.Timeout | null = null
@@ -88,10 +88,16 @@ export default function ShopSection() {
       
       // Reset to start when reaching the end of first set (seamless infinite loop)
       if (scrollPosition >= singleSetWidth) {
+        // Instant reset without animation for seamless loop
         scrollPosition = scrollPosition - singleSetWidth
+        scrollContainer.scrollTo({
+          left: scrollPosition,
+          behavior: 'auto' // Instant, no smooth scrolling
+        })
+      } else {
+        scrollContainer.scrollLeft = scrollPosition
       }
       
-      scrollContainer.scrollLeft = scrollPosition
       animationFrameId = requestAnimationFrame(autoScroll)
     }
 
