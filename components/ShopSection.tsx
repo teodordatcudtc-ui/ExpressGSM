@@ -182,35 +182,54 @@ export default function ShopSection() {
             Descoperă gama noastră completă de produse GSM de calitate
           </p>
 
-          {/* Category Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {/* All Categories Button */}
-            <button
-              onClick={() => setSelectedCategory(null)}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                selectedCategory === null
-                  ? 'bg-primary-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-primary-600 hover:text-primary-600'
-              }`}
-            >
-              Toate Categoriile
-            </button>
-
-            {/* Category Buttons */}
-            {categories.map((category) => (
+          {/* Category Buttons - Horizontal Scroll on Mobile */}
+          <div className="w-full overflow-x-auto pb-2 -mx-4 px-4 lg:mx-0 lg:px-0">
+            <div className="flex items-center gap-4 min-w-max">
+              {/* All Categories Button */}
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                  selectedCategory === category.id
+                onClick={() => setSelectedCategory(null)}
+                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
+                  selectedCategory === null
                     ? 'bg-primary-600 text-white shadow-lg'
                     : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-primary-600 hover:text-primary-600'
                 }`}
               >
-                {category.name}
+                Toate Categoriile
               </button>
-            ))}
+
+              {/* Category Buttons */}
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
+                    selectedCategory === category.id
+                      ? 'bg-primary-600 text-white shadow-lg'
+                      : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-primary-600 hover:text-primary-600'
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
           </div>
+          
+          {/* Hide scrollbar but keep functionality */}
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              height: 4px;
+            }
+            div::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            div::-webkit-scrollbar-thumb {
+              background: #e5e7eb;
+              border-radius: 2px;
+            }
+            div::-webkit-scrollbar-thumb:hover {
+              background: #d1d5db;
+            }
+          `}</style>
         </motion.div>
 
         {/* Carousel Container */}
