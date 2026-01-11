@@ -55,15 +55,31 @@ export default function ProductPage() {
 
   const fetchSimilarProducts = async (currentProduct: Product) => {
     try {
-      // Get products from the same category, excluding current product
-      const res = await fetch(`/api/products?categoryId=${currentProduct.category_id}&active=true`)
+      // Get products from the same category, including subcategories, excluding current product
+      const res = await fetch(`/api/products?categoryId=${currentProduct.category_id}&active=true&includeSubcategories=true`)
       const data = await res.json()
-      const similar = (Array.isArray(data) ? data : [])
+      let similar = (Array.isArray(data) ? data : [])
         .filter((p: Product) => p.id !== currentProduct.id && p.image && p.stock > 0)
-        .slice(0, 4) // Limit to 4 similar products
-      setSimilarProducts(similar)
+      
+      // If we don't have enough products from same category, get more from all products
+      if (similar.length < 4) {
+        const allRes = await fetch('/api/products?active=true')
+        const allData = await allRes.json()
+        const additional = (Array.isArray(allData) ? allData : [])
+          .filter((p: Product) => 
+            p.id !== currentProduct.id && 
+            p.image && 
+            p.stock > 0 &&
+            !similar.some(sp => sp.id === p.id)
+          )
+          .slice(0, 4 - similar.length)
+        similar = [...similar, ...additional]
+      }
+      
+      setSimilarProducts(similar.slice(0, 4)) // Limit to 4 similar products
     } catch (error) {
       console.error('Error fetching similar products:', error)
+      setSimilarProducts([])
     }
   }
 
