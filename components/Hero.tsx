@@ -192,6 +192,18 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="space-y-3 md:space-y-6 relative z-20 text-center lg:text-left lg:left-[-96px] xl:left-[-128px] 2xl:left-[-160px] -mt-12 md:mt-0"
           >
+            {/* Brand Name - Hidden on mobile, visible on desktop */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="mb-2 hidden md:block"
+            >
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
+                <span className="text-gray-900">ecranul</span>
+                <span className="text-primary-600">.ro</span>
+              </h2>
+            </motion.div>
 
             {/* Tag */}
             <motion.div
