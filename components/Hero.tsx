@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 export default function Hero() {
   return (
-    <section className="relative py-8 md:py-12 lg:py-16 flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary-50 via-primary-100/50 to-white">
+    <section className="relative py-12 md:py-12 lg:py-16 flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary-50 via-primary-100/50 to-white">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden z-0">
         {/* Existing shapes */}

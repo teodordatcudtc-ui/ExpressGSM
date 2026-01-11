@@ -166,8 +166,10 @@ export default function ShopSection() {
   }
 
   return (
-    <section className="py-8 md:py-16 lg:py-24 bg-white">
-      <div className="container-custom">
+    <section className="py-8 md:py-16 lg:py-24 bg-gradient-to-b from-white via-white to-white relative -mt-8 md:mt-0">
+      {/* Smooth transition gradient from Hero */}
+      <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-primary-50/50 via-primary-50/30 to-transparent pointer-events-none" />
+      <div className="container-custom relative z-10">
         {/* Header - Hidden on mobile */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
