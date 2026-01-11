@@ -52,7 +52,7 @@ export default function ShopSection() {
     scrollContainer.scrollLeft = 0
 
     let scrollPosition = 0
-    const scrollSpeed = 1.5
+    const scrollSpeed = 0.4
     let animationFrameId: number | null = null
     let isPaused = false
     let pauseTimeout: NodeJS.Timeout | null = null
@@ -270,18 +270,18 @@ export default function ShopSection() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.3 }}
                   whileHover={{ y: -8 }}
-                  className="flex-shrink-0 w-[220px] md:w-[260px] lg:w-[280px] bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col"
+                  className="flex-shrink-0 w-[180px] md:w-[220px] lg:w-[260px] bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col"
                 >
                   {/* Product Image */}
                   <Link href={`/shop/${product.slug}`}>
-                    <div className="relative h-36 md:h-44 lg:h-48 bg-white cursor-pointer flex items-center justify-center p-3 md:p-4 group">
+                    <div className="relative h-32 md:h-40 lg:h-44 bg-white cursor-pointer flex items-center justify-center p-2 md:p-3 lg:p-4 group">
                       {product.image ? (
                         <Image
                           src={product.image}
                           alt={product.name}
                           fill
                           className="object-contain group-hover:scale-110 transition-transform duration-300"
-                          sizes="(max-width: 768px) 220px, (max-width: 1024px) 260px, 280px"
+                          sizes="(max-width: 768px) 180px, (max-width: 1024px) 220px, 260px"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -296,12 +296,12 @@ export default function ShopSection() {
                   </Link>
 
                   {/* Product Info */}
-                  <div className="p-3 md:p-4 lg:p-5 flex flex-col flex-grow">
-                    <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
+                  <div className="p-2 md:p-3 lg:p-4 flex flex-col flex-grow">
+                    <p className="text-[10px] md:text-xs text-gray-500 mb-1 uppercase tracking-wide">
                       {product.category_name}
                     </p>
                     <Link href={`/shop/${product.slug}`}>
-                      <h3 className="text-sm md:text-base lg:text-lg font-bold text-gray-900 mb-2 hover:text-primary-600 transition-colors cursor-pointer line-clamp-2">
+                      <h3 className="text-xs md:text-sm lg:text-base font-bold text-gray-900 mb-1 md:mb-2 hover:text-primary-600 transition-colors cursor-pointer line-clamp-2">
                         {product.name}
                       </h3>
                     </Link>
