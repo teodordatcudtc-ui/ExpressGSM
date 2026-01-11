@@ -183,7 +183,7 @@ export default function ShopSection() {
           </p>
 
           {/* Category Buttons - Horizontal Scroll on Mobile */}
-          <div className="w-full overflow-x-auto pb-2 -mx-4 px-4 lg:mx-0 lg:px-0">
+          <div className="w-full overflow-x-auto pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 scrollbar-hide">
             <div className="flex items-center gap-4 min-w-max">
               {/* All Categories Button */}
               <button
@@ -213,23 +213,6 @@ export default function ShopSection() {
               ))}
             </div>
           </div>
-          
-          {/* Hide scrollbar but keep functionality */}
-          <style jsx>{`
-            div::-webkit-scrollbar {
-              height: 4px;
-            }
-            div::-webkit-scrollbar-track {
-              background: transparent;
-            }
-            div::-webkit-scrollbar-thumb {
-              background: #e5e7eb;
-              border-radius: 2px;
-            }
-            div::-webkit-scrollbar-thumb:hover {
-              background: #d1d5db;
-            }
-          `}</style>
         </motion.div>
 
         {/* Carousel Container */}
@@ -324,12 +307,6 @@ export default function ShopSection() {
           </div>
         )}
 
-        {/* Custom Scrollbar Hide */}
-        <style jsx>{`
-          div::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
       </div>
     </section>
   )
