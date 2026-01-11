@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary-50 via-primary-100/50 to-white">
+    <section className="relative py-8 md:py-12 lg:py-16 flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary-50 via-primary-100/50 to-white">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden z-0">
         {/* Existing shapes */}
@@ -180,7 +180,7 @@ export default function Hero() {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-0 sm:px-2 lg:pl-0 lg:pr-8 relative z-10 py-16 overflow-visible">
+      <div className="max-w-7xl mx-auto px-0 sm:px-2 lg:pl-0 lg:pr-8 relative z-10 py-4 md:py-8 overflow-visible">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Text Content */}
           <motion.div
