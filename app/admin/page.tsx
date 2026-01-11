@@ -205,6 +205,7 @@ function AdminDashboardContent() {
   }
 
   const handleEditProduct = (product: Product) => {
+    fetchCategories() // Reîncarcă categoriile când se deschide formularul
     setEditingProduct(product)
     setFormData({
       name: product.name,
@@ -332,6 +333,7 @@ function AdminDashboardContent() {
               <button
                 onClick={() => {
                   resetForm()
+                  fetchCategories() // Reîncarcă categoriile când se deschide formularul
                   setShowProductForm(true)
                 }}
                 className="btn-primary flex items-center gap-2"
