@@ -48,16 +48,6 @@ export default function ShopSection() {
     const scrollContainer = scrollContainerRef.current
     if (!scrollContainer) return
 
-    // Check if device is mobile (touch device)
-    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-    
-    // Only enable auto-scroll on desktop, allow manual scroll on mobile
-    if (isMobile) {
-      // On mobile, just reset scroll position and allow manual scrolling
-      scrollContainer.scrollLeft = 0
-      return
-    }
-
     // Reset scroll position when products change
     scrollContainer.scrollLeft = 0
 
@@ -66,6 +56,9 @@ export default function ShopSection() {
     let animationFrameId: number | null = null
     let isPaused = false
     let pauseTimeout: NodeJS.Timeout | null = null
+    let isUserScrolling = false
+    let userScrollTimeout: NodeJS.Timeout | null = null
+    let lastScrollLeft = 0
 
     const handleMouseEnter = () => {
       isPaused = true
@@ -79,11 +72,36 @@ export default function ShopSection() {
       }, 100)
     }
 
+    // Detect manual scrolling (touch or mouse drag)
+    const handleScroll = () => {
+      const currentScrollLeft = scrollContainer.scrollLeft
+      
+      // If user manually scrolled (difference is significant)
+      if (Math.abs(currentScrollLeft - lastScrollLeft) > 5) {
+        isUserScrolling = true
+        isPaused = true
+        
+        // Clear any existing timeout
+        if (userScrollTimeout) clearTimeout(userScrollTimeout)
+        
+        // Resume auto-scroll after user stops scrolling for 2 seconds
+        userScrollTimeout = setTimeout(() => {
+          isUserScrolling = false
+          isPaused = false
+          // Sync scrollPosition with current scroll
+          scrollPosition = currentScrollLeft
+        }, 2000)
+      }
+      
+      lastScrollLeft = currentScrollLeft
+    }
+
     scrollContainer.addEventListener('mouseenter', handleMouseEnter)
     scrollContainer.addEventListener('mouseleave', handleMouseLeave)
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true })
 
     const autoScroll = () => {
-      if (isPaused) {
+      if (isPaused || isUserScrolling) {
         animationFrameId = requestAnimationFrame(autoScroll)
         return
       }
@@ -99,6 +117,7 @@ export default function ShopSection() {
       }
       
       scrollContainer.scrollLeft = scrollPosition
+      lastScrollLeft = scrollPosition
       animationFrameId = requestAnimationFrame(autoScroll)
     }
 
@@ -111,8 +130,12 @@ export default function ShopSection() {
       if (pauseTimeout) {
         clearTimeout(pauseTimeout)
       }
+      if (userScrollTimeout) {
+        clearTimeout(userScrollTimeout)
+      }
       scrollContainer.removeEventListener('mouseenter', handleMouseEnter)
       scrollContainer.removeEventListener('mouseleave', handleMouseLeave)
+      scrollContainer.removeEventListener('scroll', handleScroll)
     }
   }, [products])
 
@@ -247,18 +270,18 @@ export default function ShopSection() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.3 }}
                   whileHover={{ y: -8 }}
-                  className="flex-shrink-0 w-[280px] md:w-[300px] bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col"
+                  className="flex-shrink-0 w-[220px] md:w-[260px] lg:w-[280px] bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col"
                 >
                   {/* Product Image */}
                   <Link href={`/shop/${product.slug}`}>
-                    <div className="relative h-48 bg-white cursor-pointer flex items-center justify-center p-4 group">
+                    <div className="relative h-36 md:h-44 lg:h-48 bg-white cursor-pointer flex items-center justify-center p-3 md:p-4 group">
                       {product.image ? (
                         <Image
                           src={product.image}
                           alt={product.name}
                           fill
                           className="object-contain group-hover:scale-110 transition-transform duration-300"
-                          sizes="(max-width: 768px) 280px, 300px"
+                          sizes="(max-width: 768px) 220px, (max-width: 1024px) 260px, 280px"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -273,12 +296,12 @@ export default function ShopSection() {
                   </Link>
 
                   {/* Product Info */}
-                  <div className="p-5 flex flex-col flex-grow">
+                  <div className="p-3 md:p-4 lg:p-5 flex flex-col flex-grow">
                     <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
                       {product.category_name}
                     </p>
                     <Link href={`/shop/${product.slug}`}>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 hover:text-primary-600 transition-colors cursor-pointer line-clamp-2">
+                      <h3 className="text-sm md:text-base lg:text-lg font-bold text-gray-900 mb-2 hover:text-primary-600 transition-colors cursor-pointer line-clamp-2">
                         {product.name}
                       </h3>
                     </Link>

@@ -7,9 +7,12 @@ import Image from 'next/image'
 
 export default function Hero() {
   return (
-    <section className="relative py-12 md:py-12 lg:py-16 flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary-50 via-primary-100/50 to-white">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden z-0">
+    <section className="relative py-12 md:py-12 lg:py-16 flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary-50 via-primary-100/50 to-white md:bg-gradient-to-b md:from-primary-50 md:via-primary-100/50 md:to-white">
+      {/* Mobile: Simple gradient from blue to white */}
+      <div className="absolute inset-0 overflow-hidden z-0 md:hidden bg-gradient-to-b from-primary-100 via-primary-50 to-white" />
+      
+      {/* Desktop: Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden z-0 hidden md:block">
         {/* Existing shapes */}
         <motion.div
           className="absolute top-20 right-20 w-64 h-64 bg-primary-200/30 rounded-3xl blur-2xl"
