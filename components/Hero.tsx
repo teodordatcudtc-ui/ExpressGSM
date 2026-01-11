@@ -187,7 +187,7 @@ export default function Hero() {
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-4 md:space-y-6 relative z-20 text-center lg:text-left lg:left-[-96px] xl:left-[-128px] 2xl:left-[-160px]"
+            className="space-y-3 md:space-y-6 relative z-20 text-center lg:text-left lg:left-[-96px] xl:left-[-128px] 2xl:left-[-160px] -mt-8 md:mt-0"
           >
             {/* Brand Name */}
             <motion.div
@@ -218,7 +218,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight lg:pr-0 lg:mr-[-100px] lg:relative lg:z-30"
+              className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] md:leading-tight lg:pr-0 lg:mr-[-100px] lg:relative lg:z-30"
             >
               <span className="text-gray-900">Telefoane,</span>{' '}
               <span className="text-primary-600">Tablete</span>
@@ -231,7 +231,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl"
+              className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-xs md:max-w-xl mx-auto lg:mx-0 px-4 md:px-0"
             >
               Calitate garantată, livrare rapidă, suport dedicat.
             </motion.p>
@@ -409,28 +409,6 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <span className="text-sm text-gray-500">Scroll</span>
-          <motion.div
-            className="w-6 h-10 border-2 border-gray-300 rounded-full flex items-start justify-center p-1"
-            animate={{
-              y: [0, 8, 0],
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          >
-            <div className="w-2 h-2 bg-primary-600 rounded-full" />
-          </motion.div>
-        </motion.div>
       </div>
     </section>
   )

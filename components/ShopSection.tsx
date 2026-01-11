@@ -48,14 +48,21 @@ export default function ShopSection() {
     const scrollContainer = scrollContainerRef.current
     if (!scrollContainer) return
 
-    // Clone products for seamless loop
-    const clonedProducts = [...products, ...products]
+    // Check if device is mobile (touch device)
+    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
     
+    // Only enable auto-scroll on desktop, allow manual scroll on mobile
+    if (isMobile) {
+      // On mobile, just reset scroll position and allow manual scrolling
+      scrollContainer.scrollLeft = 0
+      return
+    }
+
     // Reset scroll position when products change
     scrollContainer.scrollLeft = 0
 
     let scrollPosition = 0
-    const scrollSpeed = 0.3 // Reduced speed for slower movement
+    const scrollSpeed = 1.5
     let animationFrameId: number | null = null
     let isPaused = false
     let pauseTimeout: NodeJS.Timeout | null = null
@@ -88,16 +95,10 @@ export default function ShopSection() {
       
       // Reset to start when reaching the end of first set (seamless infinite loop)
       if (scrollPosition >= singleSetWidth) {
-        // Instant reset without animation for seamless loop
         scrollPosition = scrollPosition - singleSetWidth
-        scrollContainer.scrollTo({
-          left: scrollPosition,
-          behavior: 'auto' // Instant, no smooth scrolling
-        })
-      } else {
-        scrollContainer.scrollLeft = scrollPosition
       }
       
+      scrollContainer.scrollLeft = scrollPosition
       animationFrameId = requestAnimationFrame(autoScroll)
     }
 
@@ -229,7 +230,7 @@ export default function ShopSection() {
           <div className="relative overflow-hidden">
             <div
               ref={scrollContainerRef}
-              className="flex gap-6 overflow-x-hidden"
+              className="flex gap-6 overflow-x-auto md:overflow-x-hidden"
               style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
