@@ -187,7 +187,7 @@ export default function Hero() {
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-3 md:space-y-6 relative z-20 text-center lg:text-left lg:left-[-96px] xl:left-[-128px] 2xl:left-[-160px] -mt-8 md:mt-0"
+            className="space-y-3 md:space-y-6 relative z-20 text-center lg:text-left lg:left-[-96px] xl:left-[-128px] 2xl:left-[-160px] -mt-12 md:mt-0"
           >
             {/* Brand Name */}
             <motion.div
@@ -236,12 +236,12 @@ export default function Hero() {
               Calitate garantată, livrare rapidă, suport dedicat.
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Hidden on mobile, will be shown below carousel */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="flex flex-col sm:flex-row items-center lg:items-start gap-4 pt-4"
+              className="hidden md:flex flex-col sm:flex-row items-center lg:items-start gap-4 pt-4"
             >
               <Link
                 href="/shop"

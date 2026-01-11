@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { FiShoppingBag } from 'react-icons/fi'
+import { FiShoppingBag, FiArrowRight } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
 
 interface Category {
@@ -166,15 +166,15 @@ export default function ShopSection() {
   }
 
   return (
-    <section className="section-padding bg-white">
+    <section className="py-8 md:py-16 lg:py-24 bg-white">
       <div className="container-custom">
-        {/* Header */}
+        {/* Header - Hidden on mobile */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="hidden md:block text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
             Magazinul <span className="text-primary-600">Nostru</span>
@@ -308,6 +308,16 @@ export default function ShopSection() {
           </div>
         )}
 
+        {/* CTA Button - Show below carousel on mobile only */}
+        <div className="md:hidden mt-8 flex justify-center">
+          <Link
+            href="/shop"
+            className="btn-primary flex items-center justify-center gap-2 text-lg px-8 py-4 rounded-xl"
+          >
+            <span>Explorează produsele</span>
+            <FiArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
       </div>
     </section>
   )
