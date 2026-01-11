@@ -55,16 +55,21 @@ export default function ShopSection() {
     scrollContainer.scrollLeft = 0
 
     let scrollPosition = 0
-    const scrollSpeed = 0.5
+    const scrollSpeed = 1.5 // Increased speed for faster movement
     let animationFrameId: number | null = null
     let isPaused = false
+    let pauseTimeout: NodeJS.Timeout | null = null
 
     const handleMouseEnter = () => {
       isPaused = true
+      if (pauseTimeout) clearTimeout(pauseTimeout)
     }
 
     const handleMouseLeave = () => {
-      isPaused = false
+      // Resume after a short delay
+      pauseTimeout = setTimeout(() => {
+        isPaused = false
+      }, 100)
     }
 
     scrollContainer.addEventListener('mouseenter', handleMouseEnter)
@@ -95,6 +100,9 @@ export default function ShopSection() {
     return () => {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId)
+      }
+      if (pauseTimeout) {
+        clearTimeout(pauseTimeout)
       }
       scrollContainer.removeEventListener('mouseenter', handleMouseEnter)
       scrollContainer.removeEventListener('mouseleave', handleMouseLeave)
