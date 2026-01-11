@@ -153,11 +153,11 @@ export default function ProductPage() {
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 mb-16">
-            {/* Product Image - Left Side with Colored Background */}
+            {/* Product Image - Left Side */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              className="relative bg-gradient-to-br from-primary-50 to-primary-100 rounded-tl-3xl rounded-bl-3xl lg:rounded-tr-none lg:rounded-br-none flex items-center justify-center p-8 lg:p-12 min-h-[500px]"
+              className="relative bg-white rounded-tl-3xl rounded-bl-3xl lg:rounded-tr-none lg:rounded-br-none flex items-center justify-center p-8 lg:p-12 min-h-[500px]"
             >
               {/* Discount Badge - Optional, can be removed if not needed */}
               {/* <div className="absolute top-6 right-6 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
