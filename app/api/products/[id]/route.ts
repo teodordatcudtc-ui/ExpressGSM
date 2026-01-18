@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
+    // Check if Supabase is configured
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json(
+        { 
+          error: 'Database not configured', 
+          message: 'Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local' 
+        },
+        { status: 503 }
+      )
+    }
     const { data, error } = await supabase
       .from('products')
       .select(`
@@ -18,9 +28,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    const category = data.categories
+    const dataTyped = data as any
+    const category = dataTyped.categories
     const product = {
-      ...data,
+      ...dataTyped,
       category_name: category?.name,
       category_slug: category?.slug,
     }
@@ -51,10 +62,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       updateData.active = active ? 1 : 0
     }
 
-    const product = await db.update('products', parseInt(params.id), updateData)
+    const product = (await db.update('products', parseInt(params.id), updateData)) as any
 
     // Get category name
-    const category = await db.getById('categories', product.category_id)
+    const category = (await db.getById('categories', product.category_id)) as any
 
     return NextResponse.json({
       ...product,

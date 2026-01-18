@@ -27,7 +27,7 @@ export default function Header() {
   const navItems = [
     { href: '/', label: 'Acasă', icon: FiMenu },
     { href: '/shop', label: 'Magazin', icon: FiShoppingBag },
-    { href: '/servicii', label: 'Servicii', icon: FiTool },
+    { href: '/servicii', label: 'Reparații', icon: FiTool },
     { href: '/despre-noi', label: 'Despre Noi', icon: FiInfo },
     { href: '/contact', label: 'Contact', icon: FiMail },
   ]

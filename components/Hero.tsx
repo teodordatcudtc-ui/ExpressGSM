@@ -4,8 +4,11 @@ import { motion } from 'framer-motion'
 import { FiArrowRight, FiStar } from 'react-icons/fi'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useState } from 'react'
 
 export default function Hero() {
+  const [isHovered, setIsHovered] = useState(false)
+
   return (
     <section className="relative py-12 md:py-12 lg:py-16 flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary-50 via-primary-100/50 to-white md:bg-gradient-to-b md:from-primary-50 md:via-primary-100/50 md:to-white">
       {/* Mobile: Simple gradient from blue to white */}
@@ -338,24 +341,79 @@ export default function Hero() {
                 5. Dacă nu există imagini, se vor ascunde automat
               */}
               
-              {/* Device 1 - Centru (Principal) */}
+              {/* Device 1 - Centru (Principal) - Cu efect de rotație 3D */}
               <motion.div
                 initial={{ opacity: 0, y: 30, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="relative w-72 h-96 lg:w-80 lg:h-[500px] z-20"
+                className="relative w-72 h-96 lg:w-80 lg:h-[500px] z-20 group"
+                style={{ perspective: '1000px' }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
               >
-                <Image
-                  src="/hero-device-1.png"
-                  alt="Telefon"
-                  fill
-                  className="object-contain drop-shadow-2xl"
-                  style={{ filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.3))' }}
-                  onError={(e) => {
-                    // Fallback dacă imaginea nu există
-                    e.currentTarget.style.display = 'none'
+                <motion.div
+                  className="relative w-full h-full"
+                  style={{ 
+                    transformStyle: 'preserve-3d',
+                    WebkitTransformStyle: 'preserve-3d',
                   }}
-                />
+                  animate={{ rotateY: isHovered ? 180 : 0 }}
+                  transition={{ duration: 0.6, ease: 'easeInOut' }}
+                >
+                  {/* Fața telefonului */}
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden',
+                      transform: 'rotateY(0deg)',
+                      transformStyle: 'preserve-3d',
+                    }}
+                  >
+                    <Image
+                      src="/hero-device-1.png"
+                      alt="Telefon - Față"
+                      fill
+                      className="drop-shadow-2xl"
+                      style={{ 
+                        filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.3))',
+                        objectFit: 'contain',
+                        objectPosition: 'center',
+                      }}
+                      sizes="(max-width: 1024px) 288px, 320px"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Spatele telefonului (apare la rotație) */}
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden',
+                      transform: 'rotateY(180deg)',
+                      transformStyle: 'preserve-3d',
+                    }}
+                  >
+                    <Image
+                      src="/hero-device-1-back.png"
+                      alt="Telefon - Spate"
+                      fill
+                      className="drop-shadow-2xl"
+                      style={{ 
+                        filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.3))',
+                        objectFit: 'contain',
+                        objectPosition: 'center',
+                      }}
+                      sizes="(max-width: 1024px) 288px, 320px"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                      }}
+                    />
+                  </div>
+                </motion.div>
               </motion.div>
 
               {/* Device 2 - Stânga sus - Mai departat */}

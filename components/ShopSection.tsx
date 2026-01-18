@@ -36,6 +36,25 @@ export default function ShopSection() {
 
   useEffect(() => {
     fetchCategories()
+    
+    // Refresh categories when page becomes visible (user switches back to tab)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchCategories()
+      }
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    // Also refresh categories periodically (every 5 seconds) to catch changes quickly
+    const interval = setInterval(() => {
+      fetchCategories()
+    }, 5000)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      clearInterval(interval)
+    }
   }, [])
 
   useEffect(() => {
@@ -141,13 +160,28 @@ export default function ShopSection() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/categories')
+      // Add cache-busting to prevent browser cache
+      const res = await fetch(`/api/categories?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      })
       const data = await res.json()
       // Get only main categories (no parent) and limit to 4 for buttons
       const mainCategories = (Array.isArray(data) ? data : [])
         .filter((c: Category) => !c.parent_id)
         .slice(0, 4)
       setCategories(mainCategories)
+      
+      // If selected category was deleted, reset selection
+      if (selectedCategory) {
+        const categoryExists = mainCategories.find((c: Category) => c.id === selectedCategory)
+        if (!categoryExists) {
+          setSelectedCategory(null)
+          fetchProducts() // Fetch all products
+        }
+      }
     } catch (error) {
       console.error('Error fetching categories:', error)
     }

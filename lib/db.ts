@@ -45,8 +45,8 @@ export const db = {
 
   // Insert one row
   async insert(table: string, data: Record<string, any>) {
-    const { data: result, error } = await supabase
-      .from(table)
+    const { data: result, error } = await (supabase
+      .from(table) as any)
       .insert(data)
       .select()
       .single()
@@ -56,8 +56,8 @@ export const db = {
 
   // Update rows
   async update(table: string, id: number, data: Record<string, any>) {
-    const { data: result, error } = await supabase
-      .from(table)
+    const { data: result, error } = await (supabase
+      .from(table) as any)
       .update(data)
       .eq('id', id)
       .select()

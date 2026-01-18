@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     // Get all categories with parent info
     const categories = await db.getAll('categories', 'name ASC')
     
     // Add parent info manually
-    const categoriesWithParent = categories.map((cat: any) => {
-      const parent = categories.find((p: any) => p.id === cat.parent_id)
+    const categoriesWithParent = (categories as any[]).map((cat: any) => {
+      const parent = (categories as any[]).find((p: any) => p.id === cat.parent_id)
       return {
         ...cat,
         parent_name: parent?.name || null,

@@ -49,10 +49,17 @@ export default function DatabaseViewPage() {
     }
   }
 
-  const fetchTableData = async (table: string) => {
+  const fetchTableData = async (table: string, forceRefresh: boolean = false) => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/admin/database/table?name=${table}`)
+      // Add cache-busting timestamp to prevent browser cache
+      const timestamp = forceRefresh ? `&_t=${Date.now()}` : ''
+      const res = await fetch(`/api/admin/database/table?name=${table}${timestamp}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      })
       if (!res.ok) {
         throw new Error(`Failed to fetch table data: ${res.statusText}`)
       }
@@ -126,20 +133,29 @@ export default function DatabaseViewPage() {
     if (!confirm('Ești sigur că vrei să ștergi această categorie?\n\nDacă categoria este folosită de produse, nu va putea fi ștearsă.')) return
 
     try {
+      // Optimistic update: remove from UI immediately
+      setTableData(prevData => prevData.filter(row => row.id !== id))
+      
       const response = await fetch(`/api/admin/categories/${id}`, {
         method: 'DELETE',
+        cache: 'no-store',
       })
 
       if (response.ok) {
-        fetchTableData(activeTable)
+        // Force refresh to ensure we have the latest data
+        await fetchTableData(activeTable, true)
         fetchStats()
         alert('Categoria a fost ștearsă cu succes')
       } else {
+        // If deletion failed, restore the data
+        await fetchTableData(activeTable, true)
         const error = await response.json()
         alert(error.error || 'Eroare la ștergere categorie')
       }
     } catch (error) {
       console.error('Error deleting category:', error)
+      // Restore data on error
+      await fetchTableData(activeTable, true)
       alert('Eroare la ștergere categorie')
     }
   }
@@ -385,8 +401,8 @@ export default function DatabaseViewPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {tableData.map((row, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
+                  {tableData.map((row) => (
+                    <tr key={row.id || `row-${row.name || row.slug || Math.random()}`} className="hover:bg-gray-50">
                       {getTableColumns().map((column) => (
                         <td
                           key={column}

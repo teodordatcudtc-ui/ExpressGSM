@@ -42,6 +42,25 @@ export default function ShopPage() {
   useEffect(() => {
     fetchCategories()
     fetchProducts()
+    
+    // Refresh categories when page becomes visible (user switches back to tab)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchCategories()
+      }
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    // Also refresh categories periodically (every 5 seconds) to catch changes quickly
+    const interval = setInterval(() => {
+      fetchCategories()
+    }, 5000)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      clearInterval(interval)
+    }
   }, [])
 
   useEffect(() => {
@@ -52,13 +71,9 @@ export default function ShopPage() {
       setSubcategories(subs)
       setSelectedSubcategory(null) // Reset subcategory when changing main category
       
-      // If category has subcategories, don't fetch products yet
-      // Otherwise, fetch products for the category
-      if (subs.length === 0) {
-        fetchProducts(selectedCategory, false)
-      } else {
-        setProducts([]) // Clear products when showing subcategories
-      }
+      // Always fetch products for the selected category, including subcategories
+      // This ensures products appear immediately when clicking a category
+      fetchProducts(selectedCategory, true)
     } else {
       setSubcategories([])
       setSelectedSubcategory(null)
@@ -77,13 +92,45 @@ export default function ShopPage() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/categories')
+      // Add cache-busting to prevent browser cache
+      const res = await fetch(`/api/categories?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      })
       const data = await res.json()
       setCategories(data)
     } catch (error) {
       console.error('Error fetching categories:', error)
     }
   }
+  
+  // Check if selected categories still exist after categories are updated
+  useEffect(() => {
+    if (categories.length === 0) return
+    
+    // If selected category was deleted, reset selection
+    if (selectedCategory) {
+      const categoryExists = categories.find((c: Category) => c.id === selectedCategory)
+      if (!categoryExists) {
+        setSelectedCategory(null)
+        setSelectedSubcategory(null)
+        fetchProducts() // Fetch all products
+      }
+    }
+    
+    // If selected subcategory was deleted, reset subcategory selection
+    if (selectedSubcategory) {
+      const subcategoryExists = categories.find((c: Category) => c.id === selectedSubcategory)
+      if (!subcategoryExists) {
+        setSelectedSubcategory(null)
+        if (selectedCategory) {
+          fetchProducts(selectedCategory, true)
+        }
+      }
+    }
+  }, [categories])
 
   const fetchProducts = async (categoryId?: number, includeSubcategories: boolean = true) => {
     try {

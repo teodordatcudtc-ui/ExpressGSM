@@ -1,21 +1,45 @@
 // Supabase Client - Simple and Direct
 import { createClient } from '@supabase/supabase-js'
 
-// Use fallback values for build time if env vars are missing
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
+// Get environment variables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Only throw error at runtime, not at build time
-if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production') {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    console.warn(
-      'Warning: Missing Supabase environment variables!\n' +
-      'Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local'
-    )
-  }
+// Check if Supabase is properly configured
+export const isSupabaseConfigured = () => {
+  return !!(supabaseUrl && supabaseAnonKey && 
+    supabaseUrl !== 'https://placeholder.supabase.co' && 
+    supabaseAnonKey !== 'placeholder-key' &&
+    supabaseUrl.startsWith('https://') &&
+    supabaseAnonKey.length > 20)
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Only create client if properly configured
+let supabaseClient: ReturnType<typeof createClient> | null = null
+
+if (isSupabaseConfigured()) {
+  supabaseClient = createClient(supabaseUrl!, supabaseAnonKey!)
+} else {
+  // Create a mock client that throws helpful errors
+  console.warn(
+    '⚠️  Supabase not configured!\n' +
+    'Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local'
+  )
+  
+  // Create a client that will fail gracefully
+  supabaseClient = createClient(
+    'https://placeholder.supabase.co',
+    'placeholder-key',
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      }
+    }
+  )
+}
+
+export const supabase = supabaseClient
 
 export default supabase
 

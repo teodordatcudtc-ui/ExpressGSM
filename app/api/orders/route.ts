@@ -37,14 +37,14 @@ export async function POST(request: Request) {
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
 
     // Insert order
-    const order = await db.insert('orders', {
+    const order = (await db.insert('orders', {
       order_number: orderNumber,
       customer_name,
       customer_email,
       customer_phone,
       customer_address,
       total_amount: parseFloat(total_amount),
-    })
+    })) as any
 
     // Insert order items and update stock
     for (const item of items) {
@@ -57,14 +57,14 @@ export async function POST(request: Request) {
       })
       
       // Update stock
-      const product = await db.getById('products', item.product_id)
+      const product = (await db.getById('products', item.product_id)) as any
       await db.update('products', item.product_id, {
         stock: (product.stock || 0) - item.quantity
       })
     }
 
     // Get order items
-    const orderItems = await db.getWhere('order_items', { order_id: order.id })
+    const orderItems = (await db.getWhere('order_items', { order_id: order.id })) as any[]
 
     // Send confirmation email (don't wait for it, send in background)
     sendOrderConfirmationEmail({

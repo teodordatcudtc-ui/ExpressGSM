@@ -3,12 +3,12 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import {
-  FiSmartphone,
-  FiMonitor,
   FiBattery,
-  FiShoppingBag,
-  FiShield,
-  FiTool,
+  FiCamera,
+  FiVolume2,
+  FiMonitor,
+  FiZap,
+  FiCpu,
   FiCheckCircle,
   FiClock,
   FiDollarSign,
@@ -16,44 +16,12 @@ import {
 
 const services = [
   {
-    icon: FiSmartphone,
-    title: 'Reparații Telefoane',
-    description: 'Reparații profesionale pentru toate modelele de telefoane mobile.',
-    features: [
-      'Reparații pentru iPhone, Samsung, Huawei, Xiaomi și altele',
-      'Diagnostic gratuit și rapid',
-      'Piese originale și de calitate',
-      'Garanție pentru toate reparațiile',
-      'Servicii în aceeași zi (când este posibil)',
-    ],
-    color: 'from-blue-500 to-blue-600',
-    price: 'De la 50 RON',
-    image: '/servicii/reparatii-telefoane.jpg',
-    layout: 'left', // poza la stânga
-  },
-  {
-    icon: FiMonitor,
-    title: 'Înlocuire Ecrane',
-    description: 'Ecrane originale și de calitate pentru toate modelele de telefoane.',
-    features: [
-      'Ecrane originale și compatibile',
-      'Pentru toate modelele populare',
-      'Instalare profesională garantată',
-      'Protecție ecran inclusă',
-      'Garanție extinsă',
-    ],
-    color: 'from-purple-500 to-purple-600',
-    price: 'De la 150 RON',
-    image: '/servicii/ecrane.jpg',
-    layout: 'right', // poza la dreapta
-  },
-  {
     icon: FiBattery,
-    title: 'Înlocuire Baterii',
-    description: 'Baterii noi și performante pentru a restabili autonomia telefonului.',
+    title: 'Reparații Baterie',
+    description: 'Reparații și înlocuire baterii pentru toate modelele de telefoane mobile.',
     features: [
       'Baterii originale și compatibile',
-      'Capacitate maximă garantată',
+      'Diagnostic gratuit al bateriei',
       'Instalare rapidă (30-60 minute)',
       'Testare completă post-instalare',
       'Garanție 6 luni',
@@ -64,50 +32,82 @@ const services = [
     layout: 'left',
   },
   {
-    icon: FiShoppingBag,
-    title: 'Accesorii GSM',
-    description: 'Gamă completă de accesorii premium pentru telefonul tău.',
+    icon: FiCamera,
+    title: 'Reparații Camere',
+    description: 'Reparații camere foto și componente optice pentru telefoane.',
     features: [
-      'Huse și învelișuri protectoare',
-      'Încărcătoare rapide și cabluri',
-      'Căști și boxe portabile',
-      'Powerbank-uri de calitate',
-      'Accesorii auto (suporturi, încărcătoare)',
+      'Reparații camere sparte sau defecte',
+      'Înlocuire module cameră',
+      'Curățare profesională a lentilelor',
+      'Calibrare și testare funcționalitate',
+      'Garanție pentru toate reparațiile',
     ],
-    color: 'from-orange-500 to-orange-600',
-    price: 'De la 20 RON',
-    image: '/servicii/accesorii.jpg',
+    color: 'from-purple-500 to-purple-600',
+    price: 'De la 150 RON',
+    image: '/servicii/diagnostic.jpg',
     layout: 'right',
   },
   {
-    icon: FiShield,
-    title: 'Protecție & Garantie',
-    description: 'Servicii de protecție extinsă și garanție pentru investiția ta.',
+    icon: FiVolume2,
+    title: 'Reparații Difuzor',
+    description: 'Reparații difuzoare și componente audio pentru telefoane.',
     features: [
-      'Garanție extinsă pentru reparații',
-      'Protecție ecran (temperat glass)',
-      'Asigurare pentru telefoane',
-      'Servicii de mentenanță',
-      'Suport post-reparație',
+      'Reparații difuzor defect sau tăcut',
+      'Înlocuire difuzor principal',
+      'Reparații microfon',
+      'Testare calitate audio',
+      'Garanție pentru toate reparațiile',
     ],
-    color: 'from-red-500 to-red-600',
-    price: 'De la 30 RON',
-    image: '/servicii/protectie.jpg',
+    color: 'from-blue-500 to-blue-600',
+    price: 'De la 100 RON',
+    image: '/servicii/diagnostic.jpg',
     layout: 'left',
   },
   {
-    icon: FiTool,
-    title: 'Diagnostic & Consultanță',
-    description: 'Diagnostic gratuit și consultanță profesională pentru telefonul tău.',
+    icon: FiMonitor,
+    title: 'Reparații Display',
+    description: 'Reparații și înlocuire display-uri pentru toate modelele de telefoane.',
     features: [
-      'Diagnostic complet gratuit',
-      'Evaluare profesională a problemei',
-      'Estimare prețuri transparentă',
-      'Consultanță pentru alegerea soluției',
-      'Raport detaliat al diagnosticului',
+      'Ecrane originale și compatibile',
+      'Pentru toate modelele populare',
+      'Instalare profesională garantată',
+      'Protecție ecran inclusă',
+      'Garanție extinsă',
     ],
     color: 'from-indigo-500 to-indigo-600',
-    price: 'Gratuit',
+    price: 'De la 150 RON',
+    image: '/servicii/ecrane.jpg',
+    layout: 'right',
+  },
+  {
+    icon: FiZap,
+    title: 'Reparații Încărcare',
+    description: 'Reparații porturi de încărcare și componente de alimentare.',
+    features: [
+      'Reparații port USB defect',
+      'Înlocuire port de încărcare',
+      'Reparații probleme de alimentare',
+      'Testare funcționalitate completă',
+      'Garanție pentru toate reparațiile',
+    ],
+    color: 'from-orange-500 to-orange-600',
+    price: 'De la 120 RON',
+    image: '/servicii/diagnostic.jpg',
+    layout: 'left',
+  },
+  {
+    icon: FiCpu,
+    title: 'Reparații Placă Bază',
+    description: 'Reparații plăci de bază și componente electronice complexe.',
+    features: [
+      'Reparații plăci de bază defecte',
+      'Diagnostic electronic avansat',
+      'Reparații componente electronice',
+      'Testare completă funcționalitate',
+      'Garanție extinsă pentru reparații',
+    ],
+    color: 'from-red-500 to-red-600',
+    price: 'De la 200 RON',
     image: '/servicii/diagnostic.jpg',
     layout: 'right',
   },
@@ -125,11 +125,11 @@ export default function ServicesDetail() {
           className="text-center mb-16"
         >
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            Serviciile <span className="text-primary-600">Noastre</span>
+            Reparații <span className="text-primary-600">Profesionale</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Oferim soluții complete și profesionale pentru toate nevoile tale GSM. 
-            De la reparații complexe la accesorii premium, suntem aici pentru tine.
+            Oferim servicii complete de reparații pentru toate componentele telefonului tău. 
+            Diagnostic gratuit, piese de calitate și garanție pentru toate reparațiile.
           </p>
         </motion.div>
 
