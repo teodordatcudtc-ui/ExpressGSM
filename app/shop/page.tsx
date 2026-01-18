@@ -69,11 +69,21 @@ export default function ShopPage() {
       const category = categories.find((c: Category) => c.id === selectedCategory)
       const subs = categories.filter((c: Category) => c.parent_id === selectedCategory)
       setSubcategories(subs)
-      setSelectedSubcategory(null) // Reset subcategory when changing main category
       
-      // Always fetch products for the selected category, including subcategories
-      // This ensures products appear immediately when clicking a category
-      fetchProducts(selectedCategory, true)
+      // Only reset subcategory if it's not valid for the current category
+      // This prevents resetting when categories are just refreshed
+      if (selectedSubcategory) {
+        const subcategoryStillValid = subs.find((c: Category) => c.id === selectedSubcategory)
+        if (!subcategoryStillValid) {
+          setSelectedSubcategory(null)
+        }
+      }
+      
+      // Only fetch products if no subcategory is selected
+      // If subcategory is selected, let the subcategory useEffect handle it
+      if (!selectedSubcategory) {
+        fetchProducts(selectedCategory, true)
+      }
     } else {
       setSubcategories([])
       setSelectedSubcategory(null)
