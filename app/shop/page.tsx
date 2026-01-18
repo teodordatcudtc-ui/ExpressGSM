@@ -36,6 +36,7 @@ export default function ShopPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [selectedSubcategory, setSelectedSubcategory] = useState<number | null>(null)
+  const [lastSelectedCategory, setLastSelectedCategory] = useState<number | null>(null)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const { addItem, getItemCount } = useCartStore()
 
@@ -70,23 +71,31 @@ export default function ShopPage() {
       const subs = categories.filter((c: Category) => c.parent_id === selectedCategory)
       setSubcategories(subs)
       
-      // Only reset subcategory if it's not valid for the current category
-      // This prevents resetting when categories are just refreshed
-      if (selectedSubcategory) {
-        const subcategoryStillValid = subs.find((c: Category) => c.id === selectedSubcategory)
-        if (!subcategoryStillValid) {
-          setSelectedSubcategory(null)
-        }
-      }
-      
-      // Only fetch products if no subcategory is selected
-      // If subcategory is selected, let the subcategory useEffect handle it
-      if (!selectedSubcategory) {
+      // Reset subcategory only if the main category changed (not just refreshed)
+      if (lastSelectedCategory !== selectedCategory) {
+        setSelectedSubcategory(null)
+        setLastSelectedCategory(selectedCategory)
+        // Fetch products for the new category
         fetchProducts(selectedCategory, true)
+      } else {
+        // Category didn't change, just categories were refreshed
+        // Only reset subcategory if it's not valid anymore
+        if (selectedSubcategory) {
+          const subcategoryStillValid = subs.find((c: Category) => c.id === selectedSubcategory)
+          if (!subcategoryStillValid) {
+            setSelectedSubcategory(null)
+            fetchProducts(selectedCategory, true)
+          }
+          // If subcategory is still valid, don't do anything - let subcategory useEffect handle it
+        } else if (!selectedSubcategory) {
+          // No subcategory selected, fetch products for main category
+          fetchProducts(selectedCategory, true)
+        }
       }
     } else {
       setSubcategories([])
       setSelectedSubcategory(null)
+      setLastSelectedCategory(null)
       if (!selectedCategory) {
         fetchProducts()
       }
