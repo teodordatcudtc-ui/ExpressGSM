@@ -186,7 +186,7 @@ function AdminDashboardContent() {
           ...formData,
           image: imageUrl,
           price: parseFloat(formData.price),
-          discount: parseFloat(formData.discount || '0'),
+          discount: parseFloat(formData.discount || '0') || 0,
           stock: parseInt(formData.stock),
           active: true,
         }),
@@ -420,12 +420,15 @@ function AdminDashboardContent() {
                           step="0.1"
                           min="0"
                           max="100"
-                          value={formData.discount || '0'}
-                          onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
+                          value={formData.discount === '' ? '' : (formData.discount || '0')}
+                          onChange={(e) => {
+                            const value = e.target.value
+                            setFormData({ ...formData, discount: value === '' ? '' : value })
+                          }}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
                           placeholder="0"
                         />
-                        <p className="text-xs text-gray-500 mt-1">Lăsați 0 pentru fără reducere</p>
+                        <p className="text-xs text-gray-500 mt-1">Lăsați gol sau 0 pentru fără reducere</p>
                       </div>
                     </div>
                     <div>
