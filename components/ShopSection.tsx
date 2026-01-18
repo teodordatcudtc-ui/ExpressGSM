@@ -20,6 +20,7 @@ interface Product {
   slug: string
   description?: string
   price: number
+  discount?: number
   image?: string
   category_id: number
   category_name: string
@@ -197,7 +198,7 @@ export default function ShopSection() {
       const data = await res.json()
       // Get only active products with images
       const activeProducts = (Array.isArray(data) ? data : [])
-        .filter((p: Product) => p.image && p.stock > 0)
+        .filter((p: Product) => p.image)
         .slice(0, 20) // Limit to 20 products for performance
       
       // Duplicate for seamless infinite loop
@@ -242,13 +243,13 @@ export default function ShopSection() {
             Descoperă gama noastră completă de produse GSM de calitate
           </p>
 
-          {/* Category Buttons - Horizontal Scroll on Mobile */}
-          <div className="w-full overflow-x-auto pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 scrollbar-hide">
-            <div className="flex items-center gap-4 min-w-max">
+          {/* Category Buttons - Centered */}
+          <div className="w-full flex justify-center pb-2">
+            <div className="flex items-center gap-4 flex-wrap justify-center">
               {/* All Categories Button */}
               <button
                 onClick={() => setSelectedCategory(null)}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
+                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap ${
                   selectedCategory === null
                     ? 'bg-primary-600 text-white shadow-lg'
                     : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-primary-600 hover:text-primary-600'
@@ -262,7 +263,7 @@ export default function ShopSection() {
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
+                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap ${
                     selectedCategory === category.id
                       ? 'bg-primary-600 text-white shadow-lg'
                       : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-primary-600 hover:text-primary-600'
@@ -322,9 +323,22 @@ export default function ShopSection() {
                           <FiShoppingBag className="w-16 h-16 text-gray-400" />
                         </div>
                       )}
+                      {/* Discount Badge */}
+                      {product.discount && product.discount > 0 && (
+                        <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-bold shadow-lg z-10">
+                          -{product.discount}%
+                        </div>
+                      )}
                       {/* Price Badge */}
                       <div className="absolute top-3 right-3 bg-primary-600 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-lg">
-                        {product.price} RON
+                        {product.discount && product.discount > 0 ? (
+                          <div className="flex flex-col items-end">
+                            <span className="line-through text-xs opacity-75">{product.price} RON</span>
+                            <span>{((product.price * (100 - product.discount)) / 100).toFixed(2)} RON</span>
+                          </div>
+                        ) : (
+                          <div>{product.price} RON</div>
+                        )}
                       </div>
                     </div>
                   </Link>
@@ -344,10 +358,7 @@ export default function ShopSection() {
                         {product.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="text-sm text-green-600 font-semibold">
-                        În stoc
-                      </span>
+                    <div className="flex items-center justify-end mt-auto">
                       <button
                         onClick={(e) => handleAddToCart(product, e)}
                         className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-sm"

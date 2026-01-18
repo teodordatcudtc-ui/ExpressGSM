@@ -24,6 +24,7 @@ interface Product {
   slug: string
   description?: string
   price: number
+  discount?: number
   image?: string
   category_id: number
   category_name: string
@@ -293,8 +294,22 @@ export default function ShopPage() {
                           <FiShoppingBag className="w-16 h-16 text-gray-400" />
                         </div>
                       )}
+                      {/* Discount Badge */}
+                      {product.discount && product.discount > 0 && (
+                        <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-lg z-10">
+                          -{product.discount}%
+                        </div>
+                      )}
+                      {/* Price Badge */}
                       <div className="absolute top-2 right-2 bg-primary-600 text-white px-2 py-1 rounded text-sm font-semibold">
-                        {product.price} RON
+                        {product.discount && product.discount > 0 ? (
+                          <div className="flex flex-col items-end">
+                            <span className="line-through text-xs opacity-75">{product.price} RON</span>
+                            <span>{((product.price * (100 - product.discount)) / 100).toFixed(2)} RON</span>
+                          </div>
+                        ) : (
+                          <div>{product.price} RON</div>
+                        )}
                       </div>
                     </div>
                   </Link>
@@ -312,21 +327,13 @@ export default function ShopPage() {
                         {product.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {product.stock > 0 ? `În stoc (${product.stock})` : 'Stoc epuizat'}
-                      </span>
+                    <div className="flex items-center justify-end mt-auto">
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
                           handleAddToCart(product)
                         }}
-                        disabled={product.stock === 0}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
-                          product.stock > 0
-                            ? 'bg-primary-600 text-white hover:bg-primary-700'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all bg-primary-600 text-white hover:bg-primary-700"
                       >
                         <FiPlus className="w-4 h-4" />
                         Adaugă

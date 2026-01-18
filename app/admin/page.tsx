@@ -22,6 +22,7 @@ interface Product {
   slug: string
   description?: string
   price: number
+  discount?: number
   image?: string
   category_id: number
   category_name: string
@@ -54,9 +55,10 @@ function AdminDashboardContent() {
     slug: '',
     description: '',
     price: '',
+    discount: '0',
     image: '',
     category_id: '',
-    stock: '',
+    stock: '1',
   })
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string>('')
@@ -184,6 +186,7 @@ function AdminDashboardContent() {
           ...formData,
           image: imageUrl,
           price: parseFloat(formData.price),
+          discount: parseFloat(formData.discount || '0'),
           stock: parseInt(formData.stock),
           active: true,
         }),
@@ -212,6 +215,7 @@ function AdminDashboardContent() {
       slug: product.slug,
       description: product.description || '',
       price: product.price.toString(),
+      discount: (product.discount || 0).toString(),
       image: product.image || '',
       category_id: product.category_id.toString(),
       stock: product.stock.toString(),
@@ -250,9 +254,10 @@ function AdminDashboardContent() {
       slug: '',
       description: '',
       price: '',
+      discount: '0',
       image: '',
       category_id: '',
-      stock: '',
+      stock: '1',
     })
     setEditingProduct(null)
     setSelectedImage(null)
@@ -408,16 +413,32 @@ function AdminDashboardContent() {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Stoc *
+                          Reducere (%)
                         </label>
                         <input
                           type="number"
-                          value={formData.stock}
-                          onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                          required
+                          step="0.1"
+                          min="0"
+                          max="100"
+                          value={formData.discount || '0'}
+                          onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
+                          placeholder="0"
                         />
+                        <p className="text-xs text-gray-500 mt-1">Lăsați 0 pentru fără reducere</p>
                       </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Stoc *
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.stock || '1'}
+                        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">

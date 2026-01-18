@@ -4,17 +4,32 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiMenu, FiX, FiPhone, FiTool, FiShoppingBag, FiInfo, FiMail, FiShoppingCart } from 'react-icons/fi'
+import { FiMenu, FiX, FiPhone, FiTool, FiShoppingBag, FiInfo, FiMail, FiShoppingCart, FiUser } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
+import { useUserStore } from '@/store/userStore'
 import Cart from '@/components/Cart'
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const { getItemCount } = useCartStore()
+  const { isAuthenticated } = useUserStore()
   const cartItemCount = getItemCount()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Fetch user data on mount to ensure authentication state is synced
+  useEffect(() => {
+    const { fetchUserData, userId } = useUserStore.getState()
+    if (userId) {
+      fetchUserData()
+    }
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -93,13 +108,13 @@ export default function Header() {
                 )}
               </button>
               <motion.a
-                href="tel:0799665665"
+                href={mounted && isAuthenticated ? "/profile" : "/auth/login"}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center space-x-2 bg-accent-orange text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                className="p-3 text-gray-700 hover:text-primary-600 transition-colors"
+                title={mounted && isAuthenticated ? "Contul meu" : "Conectează-te / Creează cont"}
               >
-                <FiPhone className="w-5 h-5" />
-                <span>Sună Acum</span>
+                <FiUser className="w-6 h-6" />
               </motion.a>
             </div>
 
@@ -152,13 +167,14 @@ export default function Header() {
                   <FiShoppingCart className="w-5 h-5" />
                   <span>Coș ({cartItemCount})</span>
                 </button>
-                <a
-                  href="tel:0799665665"
-                  className="flex items-center justify-center space-x-2 bg-accent-orange text-white px-4 py-3 rounded-lg font-semibold mt-2"
+                <Link
+                  href={mounted && isAuthenticated ? "/profile" : "/auth/login"}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-center space-x-2 bg-primary-600 text-white px-4 py-3 rounded-lg font-semibold mt-2"
                 >
-                  <FiPhone className="w-5 h-5" />
-                  <span>Sună: 0799665665</span>
-                </a>
+                  <FiUser className="w-5 h-5" />
+                  <span>{mounted && isAuthenticated ? "Contul meu" : "Conectează-te"}</span>
+                </Link>
               </nav>
             </motion.div>
           )}

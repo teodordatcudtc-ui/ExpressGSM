@@ -13,6 +13,7 @@ interface Product {
   slug: string
   description?: string
   price: number
+  discount?: number
   image?: string
   category_id: number
   category_name: string
@@ -72,7 +73,7 @@ export default function ProductCarousel() {
       const data = await res.json()
       // Get only active products with images, limit to 15 for performance
       const activeProducts = (Array.isArray(data) ? data : [])
-        .filter((p: Product) => p.image && p.stock > 0)
+        .filter((p: Product) => p.image)
         .slice(0, 15)
       
       // Duplicate products multiple times for seamless infinite loop
@@ -178,9 +179,22 @@ export default function ProductCarousel() {
                         <FiShoppingBag className="w-16 h-16 text-gray-400" />
                       </div>
                     )}
+                    {/* Discount Badge */}
+                    {product.discount && product.discount > 0 && (
+                      <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-bold shadow-lg z-10">
+                        -{product.discount}%
+                      </div>
+                    )}
                     {/* Price Badge */}
                     <div className="absolute top-3 right-3 bg-primary-600 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-lg">
-                      {product.price} RON
+                      {product.discount && product.discount > 0 ? (
+                        <div className="flex flex-col items-end">
+                          <span className="line-through text-xs opacity-75">{product.price} RON</span>
+                          <span>{((product.price * (100 - product.discount)) / 100).toFixed(2)} RON</span>
+                        </div>
+                      ) : (
+                        <div>{product.price} RON</div>
+                      )}
                     </div>
                   </div>
                 </Link>
@@ -200,10 +214,7 @@ export default function ProductCarousel() {
                       {product.description}
                     </p>
                   )}
-                  <div className="flex items-center justify-between mt-auto">
-                    <span className="text-sm text-green-600 font-semibold">
-                      În stoc
-                    </span>
+                  <div className="flex items-center justify-end mt-auto">
                     <button
                       onClick={(e) => handleAddToCart(product, e)}
                       className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors text-sm"

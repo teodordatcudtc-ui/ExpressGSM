@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import Image from 'next/image'
 import { FiPhone, FiMapPin, FiMail, FiFacebook, FiInstagram, FiClock, FiLock } from 'react-icons/fi'
 
 export default function Footer() {
@@ -101,8 +104,67 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} ecranul.ro. Toate drepturile rezervate.</p>
+        {/* Legal Links and Badges */}
+        <div className="border-t border-gray-800 mt-8 pt-6">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+            {/* Legal Links - Left */}
+            <div className="flex flex-wrap justify-center sm:justify-start gap-4">
+              <Link href="/politica-cookie" className="text-gray-400 hover:text-primary-400 transition-colors text-sm">
+                Politica de Utilizare Cookie-uri
+              </Link>
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <Link href="/termeni-conditii" className="text-gray-400 hover:text-primary-400 transition-colors text-sm">
+                Termeni și Condiții
+              </Link>
+            </div>
+
+            {/* ANPC Badges - Right */}
+            <div className="flex flex-wrap justify-center sm:justify-end items-center gap-4">
+              <a
+                href="https://anpc.ro/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition-opacity inline-block"
+                title="Autoritatea Națională pentru Protecția Consumatorilor"
+              >
+                <Image
+                  src="/anpc-badge.png"
+                  alt="ANPC - Autoritatea Națională pentru Protecția Consumatorilor"
+                  width={80}
+                  height={40}
+                  className="h-10 w-auto object-contain"
+                  onError={(e) => {
+                    // Fallback dacă imaginea nu există
+                    e.currentTarget.style.display = 'none'
+                  }}
+                />
+              </a>
+              <a
+                href="https://ec.europa.eu/consumers/odr/main/index.cfm?event=main.home2.show&lng=RO"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition-opacity inline-block"
+                title="Platforma Online de Soluționare Alternativă a Litigiilor"
+              >
+                <Image
+                  src="/sol-badge.png"
+                  alt="SOL - Platforma Online de Soluționare Alternativă a Litigiilor"
+                  width={80}
+                  height={40}
+                  className="h-10 w-auto object-contain"
+                  onError={(e) => {
+                    // Fallback dacă imaginea nu există
+                    e.currentTarget.style.display = 'none'
+                  }}
+                />
+              </a>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="text-center text-gray-400 text-sm">
+            <p>&copy; {new Date().getFullYear()} ecranul.ro. Toate drepturile rezervate.</p>
+          </div>
         </div>
       </div>
     </footer>

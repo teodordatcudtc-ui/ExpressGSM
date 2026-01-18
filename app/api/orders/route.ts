@@ -2,13 +2,29 @@ import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { sendOrderConfirmationEmail } from '@/lib/email'
 
-export async function GET() {
+export const dynamic = 'force-dynamic'
+
+export async function GET(request: Request) {
   try {
-    const orders = await db.getAll('orders', 'created_at DESC')
+    const { searchParams } = new URL(request.url)
+    const userId = searchParams.get('userId')
+
+    let orders
+    if (userId) {
+      // Get orders for specific user
+      orders = await db.getWhere('orders', { user_id: parseInt(userId) })
+      // Sort by created_at DESC
+      orders = (orders as any[]).sort((a: any, b: any) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+    } else {
+      // Get all orders (for admin)
+      orders = await db.getAll('orders', 'created_at DESC')
+    }
     
     // Get item counts for each order
     const ordersWithCounts = await Promise.all(
-      orders.map(async (order: any) => {
+      (orders as any[]).map(async (order: any) => {
         const count = await db.count('order_items', { order_id: order.id })
         return {
           ...order,
@@ -27,7 +43,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { customer_name, customer_email, customer_phone, customer_address, items, total_amount } = body
+    const { customer_name, customer_email, customer_phone, customer_address, items, total_amount, user_id } = body
 
     if (!customer_name || !customer_email || !customer_phone || !customer_address || !items || items.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -44,6 +60,7 @@ export async function POST(request: Request) {
       customer_phone,
       customer_address,
       total_amount: parseFloat(total_amount),
+      user_id: user_id ? parseInt(user_id) : null,
     })) as any
 
     // Insert order items and update stock

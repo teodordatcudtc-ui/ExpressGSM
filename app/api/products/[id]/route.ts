@@ -46,13 +46,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
     const body = await request.json()
-    const { name, slug, description, price, image, category_id, stock, active } = body
+    const { name, slug, description, price, discount, image, category_id, stock, active } = body
 
     const updateData: Record<string, any> = {
       name,
       slug,
       description: description || null,
       price: parseFloat(price),
+      discount: discount !== undefined ? parseFloat(discount) : 0,
       image: image || null,
       category_id: parseInt(category_id),
       stock: parseInt(stock) || 0,

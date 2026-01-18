@@ -15,6 +15,7 @@ interface Product {
   slug: string
   description?: string
   price: number
+  discount?: number
   image?: string
   category_id: number
   category_name: string
@@ -59,7 +60,7 @@ export default function ProductPage() {
       const res = await fetch(`/api/products?categoryId=${currentProduct.category_id}&active=true&includeSubcategories=true`)
       const data = await res.json()
       let similar = (Array.isArray(data) ? data : [])
-        .filter((p: Product) => p.id !== currentProduct.id && p.image && p.stock > 0)
+        .filter((p: Product) => p.id !== currentProduct.id && p.image)
       
       // If we don't have enough products from same category, get more from all products
       if (similar.length < 4) {
@@ -68,8 +69,7 @@ export default function ProductPage() {
         const additional = (Array.isArray(allData) ? allData : [])
           .filter((p: Product) => 
             p.id !== currentProduct.id && 
-            p.image && 
-            p.stock > 0 &&
+            p.image &&
             !similar.some(sp => sp.id === p.id)
           )
           .slice(0, 4 - similar.length)
@@ -84,12 +84,17 @@ export default function ProductPage() {
   }
 
   const handleAddToCart = () => {
-    if (!product || product.stock === 0) return
+    if (!product) return
+
+    // Calculate final price with discount
+    const finalPrice = product.discount && product.discount > 0
+      ? (product.price * (100 - product.discount)) / 100
+      : product.price
 
     addItem({
       product_id: product.id,
       product_name: product.name,
-      price: product.price,
+      price: finalPrice,
       image: product.image,
       quantity: quantity,
     })
@@ -102,9 +107,7 @@ export default function ProductPage() {
   }
 
   const increaseQuantity = () => {
-    if (product && quantity < product.stock) {
-      setQuantity(quantity + 1)
-    }
+    setQuantity(quantity + 1)
   }
 
   const decreaseQuantity = () => {
@@ -207,8 +210,29 @@ export default function ProductPage() {
 
               {/* Price */}
               <div className="mb-8">
-                <span className="text-5xl font-bold text-primary-600">{product.price}</span>
-                <span className="text-2xl text-gray-600 ml-2">lei</span>
+                {product.discount && product.discount > 0 ? (
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm font-bold">
+                        -{product.discount}%
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-5xl font-bold text-primary-600">
+                        {((product.price * (100 - product.discount)) / 100).toFixed(2)}
+                      </span>
+                      <span className="text-2xl text-gray-600">lei</span>
+                      <span className="text-2xl text-gray-400 line-through">
+                        {product.price} lei
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="text-5xl font-bold text-primary-600">{product.price}</span>
+                    <span className="text-2xl text-gray-600 ml-2">lei</span>
+                  </div>
+                )}
               </div>
 
               {/* Technical Specifications / Description */}
@@ -222,40 +246,35 @@ export default function ProductPage() {
               )}
 
               {/* Quantity Selector */}
-              {product.stock > 0 && (
-                <div className="mb-8">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    Cantitate:
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={decreaseQuantity}
-                      disabled={quantity <= 1}
-                      className="w-12 h-12 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-primary-600 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <FiMinus className="w-5 h-5" />
-                    </button>
-                    <span className="text-2xl font-bold text-gray-900 w-16 text-center">{quantity}</span>
-                    <button
-                      onClick={increaseQuantity}
-                      disabled={quantity >= product.stock}
-                      className="w-12 h-12 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-primary-600 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <FiPlus className="w-5 h-5" />
-                    </button>
-                  </div>
+              <div className="mb-8">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Cantitate:
+                </label>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={decreaseQuantity}
+                    disabled={quantity <= 1}
+                    className="w-12 h-12 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-primary-600 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <FiMinus className="w-5 h-5" />
+                  </button>
+                  <span className="text-2xl font-bold text-gray-900 w-16 text-center">{quantity}</span>
+                  <button
+                    onClick={increaseQuantity}
+                    className="w-12 h-12 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-primary-600 hover:bg-primary-50 transition-colors"
+                  >
+                    <FiPlus className="w-5 h-5" />
+                  </button>
                 </div>
-              )}
+              </div>
 
               {/* Add to Cart Button */}
               <button
                 onClick={handleAddToCart}
-                disabled={product.stock === 0 || addedToCart}
+                disabled={addedToCart}
                 className={`w-full btn-primary flex items-center justify-center gap-3 text-lg py-4 rounded-xl mb-8 ${
                   addedToCart
                     ? 'bg-green-600 hover:bg-green-700'
-                    : product.stock === 0
-                    ? 'opacity-50 cursor-not-allowed'
                     : ''
                 }`}
               >
@@ -344,15 +363,32 @@ export default function ProductPage() {
                         </h3>
                       </Link>
                       <div className="mt-auto pt-4 flex items-center justify-between">
-                        <span className="text-xl font-bold text-primary-600">
-                          {similarProduct.price} RON
-                        </span>
+                        <div className="flex flex-col">
+                          {similarProduct.discount && similarProduct.discount > 0 ? (
+                            <>
+                              <span className="text-xl font-bold text-primary-600">
+                                {((similarProduct.price * (100 - similarProduct.discount)) / 100).toFixed(2)} RON
+                              </span>
+                              <span className="text-sm text-gray-400 line-through">
+                                {similarProduct.price} RON
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-xl font-bold text-primary-600">
+                              {similarProduct.price} RON
+                            </span>
+                          )}
+                        </div>
                         <button
                           onClick={() => {
+                            const finalPrice = similarProduct.discount && similarProduct.discount > 0
+                              ? (similarProduct.price * (100 - similarProduct.discount)) / 100
+                              : similarProduct.price
+                            
                             addItem({
                               product_id: similarProduct.id,
                               product_name: similarProduct.name,
-                              price: similarProduct.price,
+                              price: finalPrice,
                               image: similarProduct.image,
                               quantity: 1,
                             })
