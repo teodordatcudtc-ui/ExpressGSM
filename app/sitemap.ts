@@ -1,6 +1,11 @@
 import { MetadataRoute } from 'next'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 
+interface ProductSitemap {
+  slug: string
+  updated_at: string | null
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ecranul.ro'
   
@@ -62,7 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .order('updated_at', { ascending: false })
 
       if (!error && products) {
-        productPages = products.map((product) => ({
+        productPages = (products as ProductSitemap[]).map((product) => ({
           url: `${baseUrl}/shop/${product.slug}`,
           lastModified: product.updated_at ? new Date(product.updated_at) : new Date(),
           changeFrequency: 'weekly' as const,
