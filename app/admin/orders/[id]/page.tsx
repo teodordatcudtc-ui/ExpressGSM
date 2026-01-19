@@ -98,7 +98,11 @@ export default function OrderDetailPage() {
             // Refresh orders list when going back
             router.push('/admin?tab=orders')
           }}
+<<<<<<< HEAD
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+=======
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 text-sm sm:text-base"
+>>>>>>> defd91e (update)
         >
           <FiArrowLeft className="w-5 h-5" />
           Înapoi la Comenzi
@@ -107,6 +111,7 @@ export default function OrderDetailPage() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
+<<<<<<< HEAD
           className="bg-white rounded-xl shadow-lg p-6"
         >
           <div className="flex justify-between items-start mb-6">
@@ -115,6 +120,16 @@ export default function OrderDetailPage() {
               <p className="text-gray-600">Plasată pe {new Date(order.created_at).toLocaleDateString('ro-RO')}</p>
             </div>
             <div className="flex gap-2">
+=======
+          className="bg-white rounded-xl shadow-lg p-4 sm:p-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Comandă #{order.order_number}</h1>
+              <p className="text-gray-600 text-sm sm:text-base">Plasată pe {new Date(order.created_at).toLocaleDateString('ro-RO')}</p>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+>>>>>>> defd91e (update)
               <span className={`px-3 py-1 rounded text-sm font-semibold ${
                 order.status === 'completed' ? 'bg-green-100 text-green-800' :
                 order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
@@ -134,6 +149,7 @@ export default function OrderDetailPage() {
           {/* Customer Info */}
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Date Client</h2>
+<<<<<<< HEAD
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600">Nume</p>
@@ -150,6 +166,24 @@ export default function OrderDetailPage() {
               <div>
                 <p className="text-sm text-gray-600">Adresă</p>
                 <p className="font-semibold">{order.customer_address}</p>
+=======
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-600">Nume</p>
+                <p className="font-semibold break-words">{order.customer_name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Email</p>
+                <p className="font-semibold break-words">{order.customer_email}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Telefon</p>
+                <p className="font-semibold break-words">{order.customer_phone}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Adresă</p>
+                <p className="font-semibold break-words">{order.customer_address}</p>
+>>>>>>> defd91e (update)
               </div>
             </div>
           </div>
@@ -159,12 +193,21 @@ export default function OrderDetailPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">Produse</h2>
             <div className="space-y-2">
               {order.items.map((item) => (
+<<<<<<< HEAD
                 <div key={item.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
                   <div>
                     <p className="font-semibold text-gray-900">{item.product_name}</p>
                     <p className="text-sm text-gray-600">Cantitate: {item.quantity}</p>
                   </div>
                   <p className="font-bold text-primary-600">{(item.price * item.quantity).toFixed(2)} RON</p>
+=======
+                <div key={item.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 bg-gray-50 rounded gap-2">
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900 break-words">{item.product_name}</p>
+                    <p className="text-sm text-gray-600">Cantitate: {item.quantity}</p>
+                  </div>
+                  <p className="font-bold text-primary-600 text-lg sm:text-base">{(item.price * item.quantity).toFixed(2)} RON</p>
+>>>>>>> defd91e (update)
                 </div>
               ))}
             </div>
@@ -172,24 +215,39 @@ export default function OrderDetailPage() {
 
           {/* Total */}
           <div className="border-t pt-4 mb-6">
+<<<<<<< HEAD
             <div className="flex justify-between text-2xl font-bold">
+=======
+            <div className="flex justify-between text-xl sm:text-2xl font-bold">
+>>>>>>> defd91e (update)
               <span>Total:</span>
               <span className="text-primary-600">{order.total_amount.toFixed(2)} RON</span>
             </div>
           </div>
 
           {/* Actions */}
+<<<<<<< HEAD
           <div className="flex gap-4">
             <button
               onClick={() => updateOrderStatus('processing')}
               className="btn-secondary flex items-center gap-2"
+=======
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={() => updateOrderStatus('processing')}
+              className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto"
+>>>>>>> defd91e (update)
             >
               <FiCheck className="w-5 h-5" />
               Marchează ca Procesare
             </button>
             <button
               onClick={() => updateOrderStatus('completed', 'paid')}
+<<<<<<< HEAD
               className="btn-primary flex items-center gap-2"
+=======
+              className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+>>>>>>> defd91e (update)
             >
               <FiCheck className="w-5 h-5" />
               Finalizează Comanda

@@ -7,13 +7,13 @@ import Footer from '@/components/Footer'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'ecranul.ro - Reparații Telefoane & Accesorii București',
-  description: 'Service GSM profesional în București. Reparații telefoane, vânzări accesorii, ecrane, baterii. Servicii rapide și de calitate la Strada Pajurei 7, București.',
-  keywords: 'reparații telefoane București, service GSM, accesorii telefoane, ecrane telefoane, baterii telefoane, ecranul.ro',
+  title: 'ecranul.ro - Magazin Online Telefoane & Reparații GSM București',
+  description: 'Magazin online de telefoane, tablete și laptopuri. Reparații GSM profesionale în București. Vânzări accesorii, ecrane, baterii. Servicii rapide și de calitate la Strada Pajurei 7, București.',
+  keywords: 'magazin online telefoane, reparații telefoane București, service GSM, accesorii telefoane, ecrane telefoane, baterii telefoane, vânzări telefoane, ecranul.ro',
   authors: [{ name: 'ecranul.ro' }],
   openGraph: {
-    title: 'ecranul.ro - Service GSM București',
-    description: 'Reparații telefoane profesionale și accesorii GSM în București',
+    title: 'ecranul.ro - Magazin Online Telefoane & Service GSM București',
+    description: 'Magazin online de telefoane și reparații GSM profesionale în București',
     type: 'website',
     locale: 'ro_RO',
   },

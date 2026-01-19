@@ -186,14 +186,14 @@ export default function Hero() {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-0 sm:px-2 lg:pl-0 lg:pr-8 relative z-10 py-4 md:py-8 overflow-visible">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 relative z-10 py-4 md:py-8 overflow-visible">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Side - Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-3 md:space-y-6 relative z-20 text-center lg:text-left lg:left-[-96px] xl:left-[-128px] 2xl:left-[-160px] -mt-12 md:mt-0"
+            className="space-y-3 md:space-y-6 relative z-20 text-center lg:text-left -mt-12 md:mt-0"
           >
             {/* Brand Name - Hidden on mobile, visible on desktop */}
             <motion.div
@@ -202,7 +202,7 @@ export default function Hero() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="mb-2 hidden md:block"
             >
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
+              <h2 className="text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-bold">
                 <span className="text-gray-900">ecranul</span>
                 <span className="text-primary-600">.ro</span>
               </h2>
@@ -224,7 +224,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] md:leading-tight lg:pr-0 lg:mr-[-100px] lg:relative lg:z-30"
+              className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-[1.1] md:leading-tight"
             >
               <span className="text-gray-900">Telefoane,</span>{' '}
               <span className="text-primary-600">Tablete</span>
@@ -237,7 +237,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-xs md:max-w-xl mx-auto lg:mx-0 px-4 md:px-0"
+              className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-xs md:max-w-xl mx-auto lg:mx-0"
             >
               Calitate garantată, livrare rapidă, suport dedicat.
             </motion.p>
@@ -270,7 +270,7 @@ export default function Hero() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative h-[600px] lg:h-[700px] hidden lg:block"
+            className="relative h-[500px] lg:h-[550px] xl:h-[650px] 2xl:h-[700px] hidden lg:block"
           >
             {/* Abstract Background Shapes */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -346,7 +346,7 @@ export default function Hero() {
                 initial={{ opacity: 0, y: 30, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="relative w-72 h-96 lg:w-80 lg:h-[500px] z-20 group"
+                className="relative w-64 h-80 lg:w-72 lg:h-96 xl:w-80 xl:h-[500px] z-20 group"
                 style={{ perspective: '1000px' }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
@@ -380,7 +380,7 @@ export default function Hero() {
                         objectFit: 'contain',
                         objectPosition: 'center',
                       }}
-                      sizes="(max-width: 1024px) 288px, 320px"
+                      sizes="(max-width: 1024px) 256px, (max-width: 1280px) 288px, 320px"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none'
                       }}
@@ -407,7 +407,7 @@ export default function Hero() {
                         objectFit: 'contain',
                         objectPosition: 'center',
                       }}
-                      sizes="(max-width: 1024px) 288px, 320px"
+                      sizes="(max-width: 1024px) 256px, (max-width: 1280px) 288px, 320px"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none'
                       }}
@@ -421,7 +421,7 @@ export default function Hero() {
                 initial={{ opacity: 0, x: -30, y: -20 }}
                 animate={{ opacity: 1, x: 0, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.7 }}
-                className="absolute -top-8 -left-24 lg:-top-12 lg:-left-28 w-56 h-72 lg:w-64 lg:h-80 z-10"
+                className="absolute -top-8 -left-16 lg:-top-10 lg:-left-20 xl:-top-12 xl:-left-28 w-48 h-60 lg:w-56 lg:h-72 xl:w-64 xl:h-80 z-10"
               >
                 <Image
                   src="/hero-device-2.png"
@@ -440,7 +440,7 @@ export default function Hero() {
                 initial={{ opacity: 0, x: 30, y: 20 }}
                 animate={{ opacity: 1, x: 0, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.9 }}
-                className="absolute bottom-4 -right-24 lg:bottom-8 lg:-right-28 w-48 h-64 lg:w-56 lg:h-72 z-10"
+                className="absolute bottom-4 -right-16 lg:bottom-6 lg:-right-20 xl:bottom-8 xl:-right-28 w-40 h-56 lg:w-48 lg:h-64 xl:w-56 xl:h-72 z-10"
               >
                 <Image
                   src="/hero-device-3.png"

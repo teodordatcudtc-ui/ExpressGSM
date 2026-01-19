@@ -281,6 +281,7 @@ function AdminDashboardContent() {
     <AdminGuard>
       <div className="section-padding bg-gray-50 min-h-screen">
       <div className="container-custom max-w-7xl">
+<<<<<<< HEAD
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900">Dashboard Admin</h1>
           <div className="flex gap-3">
@@ -290,13 +291,29 @@ function AdminDashboardContent() {
             >
               <FiDatabase className="w-5 h-5" />
               Vizualizare Baza de Date
+=======
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
+          <h1 className="text-2xl sm:text-4xl font-bold text-gray-900">Dashboard Admin</h1>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <Link
+              href="/admin/database"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-colors text-sm sm:text-base"
+            >
+              <FiDatabase className="w-5 h-5" />
+              <span className="hidden sm:inline">Vizualizare Baza de Date</span>
+              <span className="sm:hidden">Baza de Date</span>
+>>>>>>> defd91e (update)
             </Link>
             <button
               onClick={() => {
                 logout()
                 window.location.href = '/admin/login'
               }}
+<<<<<<< HEAD
               className="flex items-center gap-2 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold transition-colors"
+=======
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold transition-colors text-sm sm:text-base"
+>>>>>>> defd91e (update)
             >
               <FiLogOut className="w-5 h-5" />
               Logout
@@ -305,10 +322,17 @@ function AdminDashboardContent() {
         </div>
 
         {/* Tabs */}
+<<<<<<< HEAD
         <div className="flex gap-4 mb-6 border-b">
           <button
             onClick={() => setActiveTab('products')}
             className={`px-6 py-3 font-semibold border-b-2 transition-colors ${
+=======
+        <div className="flex gap-2 sm:gap-4 mb-6 border-b overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('products')}
+            className={`px-4 sm:px-6 py-3 font-semibold border-b-2 transition-colors whitespace-nowrap ${
+>>>>>>> defd91e (update)
               activeTab === 'products'
                 ? 'border-primary-600 text-primary-600'
                 : 'border-transparent text-gray-600 hover:text-gray-900'
@@ -319,7 +343,11 @@ function AdminDashboardContent() {
           </button>
           <button
             onClick={() => setActiveTab('orders')}
+<<<<<<< HEAD
             className={`px-6 py-3 font-semibold border-b-2 transition-colors ${
+=======
+            className={`px-4 sm:px-6 py-3 font-semibold border-b-2 transition-colors whitespace-nowrap ${
+>>>>>>> defd91e (update)
               activeTab === 'orders'
                 ? 'border-primary-600 text-primary-600'
                 : 'border-transparent text-gray-600 hover:text-gray-900'
@@ -634,6 +662,7 @@ function AdminDashboardContent() {
         {activeTab === 'orders' && (
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Comenzi</h2>
+<<<<<<< HEAD
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <table className="w-full">
                 <thead className="bg-gray-50">
@@ -684,6 +713,120 @@ function AdminDashboardContent() {
                   ))}
                 </tbody>
               </table>
+=======
+            
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {orders.map((order) => (
+                <div key={order.id} className="bg-white rounded-xl shadow-lg p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="font-mono text-sm font-semibold text-gray-900 mb-1">
+                        #{order.order_number}
+                      </p>
+                      <p className="font-semibold text-gray-900">{order.customer_name}</p>
+                      <p className="text-sm text-gray-500">{order.customer_email}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-primary-600 text-lg mb-2">
+                        {order.total_amount.toFixed(2)} RON
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                      order.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {order.status}
+                    </span>
+                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                      order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {order.payment_status}
+                    </span>
+                  </div>
+                  
+                  <Link
+                    href={`/admin/orders/${order.id}`}
+                    className="w-full btn-primary flex items-center justify-center gap-2"
+                  >
+                    <FiEye className="w-4 h-4" />
+                    Vezi Comandă
+                  </Link>
+                </div>
+              ))}
+              {orders.length === 0 && (
+                <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+                  <p className="text-gray-600">Nu există comenzi</p>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Număr Comandă</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Client</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Total</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Plată</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Acțiuni</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {orders.map((order) => (
+                      <tr key={order.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 font-mono text-sm">{order.order_number}</td>
+                        <td className="px-6 py-4">
+                          <p className="font-semibold text-gray-900">{order.customer_name}</p>
+                          <p className="text-sm text-gray-500">{order.customer_email}</p>
+                        </td>
+                        <td className="px-6 py-4 font-bold text-primary-600">{order.total_amount.toFixed(2)} RON</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 rounded text-sm ${
+                            order.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 rounded text-sm ${
+                            order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {order.payment_status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Link
+                            href={`/admin/orders/${order.id}`}
+                            className="p-2 hover:bg-blue-100 text-blue-600 rounded inline-block"
+                          >
+                            <FiEye className="w-4 h-4" />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                    {orders.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
+                          Nu există comenzi
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+>>>>>>> defd91e (update)
             </div>
           </div>
         )}

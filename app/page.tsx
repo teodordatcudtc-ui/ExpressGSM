@@ -7,12 +7,12 @@ import LocationMap from '@/components/LocationMap'
 import CTA from '@/components/CTA'
 
 export const metadata: Metadata = {
-  title: 'ecranul.ro - Reparații Telefoane București | Service GSM Profesional',
-  description: 'Service GSM profesional în București. Reparații telefoane rapide, vânzări accesorii, ecrane și baterii. Servicii de calitate la Strada Pajurei 7, București.',
-  keywords: 'reparații telefoane București, service GSM, accesorii telefoane, ecrane telefoane, baterii telefoane, ecranul.ro, service iPhone, service Samsung',
+  title: 'ecranul.ro - Magazin Online Telefoane & Reparații GSM București',
+  description: 'Magazin online de telefoane, tablete și laptopuri. Reparații GSM profesionale în București. Vânzări accesorii, ecrane și baterii. Servicii de calitate la Strada Pajurei 7, București.',
+  keywords: 'magazin online telefoane, reparații telefoane București, service GSM, accesorii telefoane, ecrane telefoane, baterii telefoane, vânzări telefoane, ecranul.ro, service iPhone, service Samsung',
   openGraph: {
-    title: 'ecranul.ro - Service GSM Profesional București',
-    description: 'Reparații telefoane rapide și accesorii GSM de calitate în București',
+    title: 'ecranul.ro - Magazin Online Telefoane & Service GSM București',
+    description: 'Magazin online de telefoane și reparații GSM profesionale în București',
     type: 'website',
     locale: 'ro_RO',
   },
