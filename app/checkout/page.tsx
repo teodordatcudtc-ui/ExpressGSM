@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
-import { FiCheckCircle, FiShoppingCart, FiUser, FiMail, FiPhone, FiMapPin, FiX, FiLogOut, FiTruck, FiPackage, FiCreditCard, FiDollarSign } from 'react-icons/fi'
+import { FiCheckCircle, FiShoppingCart, FiUser, FiMail, FiPhone, FiMapPin, FiX, FiLogOut, FiTruck, FiPackage } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
 import { useUserStore } from '@/store/userStore'
 import { counties, countries } from '@/lib/romania-data'
@@ -21,15 +21,17 @@ interface CheckoutForm {
   customer_address: string
 }
 
+const CHECKOUT_DATA_KEY = 'checkout_plata_data'
+
 export default function CheckoutPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { items, getTotal, clearCart, removeItem } = useCartStore()
   const { user, isAuthenticated, logout, fetchUserData } = useUserStore()
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
   const [deliveryMethod, setDeliveryMethod] = useState<'curier_rapid' | 'ridicare_personala'>('curier_rapid')
-  const [paymentMethod, setPaymentMethod] = useState<'ramburs' | 'card_online'>('ramburs')
 
   const SHIPPING_COST = 28
   const PICKUP_ADDRESS = 'Pajurei 7, Sector 1, București, 011318'
@@ -54,6 +56,15 @@ export default function CheckoutPage() {
   })
 
   useEffect(() => {
+    const placed = searchParams.get('placed')
+    if (placed) {
+      setOrderNumber(placed)
+      setOrderSuccess(true)
+      if (typeof window !== 'undefined') try { sessionStorage.removeItem(CHECKOUT_DATA_KEY) } catch (_) {}
+    }
+  }, [searchParams])
+
+  useEffect(() => {
     if (isAuthenticated && user) {
       // Pre-fill form with user data
       setValue('first_name', user.first_name)
@@ -73,7 +84,8 @@ export default function CheckoutPage() {
   const shippingCost = deliveryMethod === 'curier_rapid' ? SHIPPING_COST : 0
   const total = subtotal + shippingCost
 
-  if (items.length === 0 && !orderSuccess) {
+  const placedFromUrl = searchParams.get('placed')
+  if (items.length === 0 && !orderSuccess && !placedFromUrl) {
     return (
       <div className="section-padding bg-gray-50 min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -90,56 +102,46 @@ export default function CheckoutPage() {
     )
   }
 
-  const onSubmit = async (data: CheckoutForm) => {
-    setIsProcessing(true)
+  const onSubmit = (data: CheckoutForm) => {
+    const customer_name = `${data.first_name} ${data.last_name}`
+    const customer_address = deliveryMethod === 'ridicare_personala'
+      ? `Ridicare personală - ${PICKUP_ADDRESS}`
+      : `${data.customer_address}, ${data.city}, ${data.county}, ${data.country}`
+
+    const subtotal = getTotal()
+    const shippingCost = deliveryMethod === 'curier_rapid' ? SHIPPING_COST : 0
+    const total = subtotal + shippingCost
 
     try {
-      const customer_name = `${data.first_name} ${data.last_name}`
-      const customer_address = deliveryMethod === 'ridicare_personala'
-        ? `Ridicare personală - ${PICKUP_ADDRESS}`
-        : `${data.customer_address}, ${data.city}, ${data.county}, ${data.country}`
-
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customer_name,
-          customer_email: data.customer_email,
-          customer_phone: data.customer_phone,
-          customer_address,
-          user_id: user?.id || null,
-          delivery_method: deliveryMethod,
-          payment_method: paymentMethod,
-          items: items.map(item => ({
-            product_id: item.product_id,
-            product_name: item.product_name,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-          total_amount: total,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to create order')
+      const payload = {
+        customer_name,
+        customer_email: data.customer_email,
+        customer_phone: data.customer_phone,
+        customer_address,
+        user_id: user?.id ?? null,
+        delivery_method: deliveryMethod,
+        items: items.map(item => ({
+          product_id: item.product_id,
+          product_name: item.product_name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subtotal,
+        shippingCost,
+        total,
       }
-
-      const order = await response.json()
-      // Clear cart immediately after successful order
-      clearCart()
-      setOrderNumber(order.order_number)
-      setOrderSuccess(true)
-    } catch (error) {
-      console.error('Error creating order:', error)
+      sessionStorage.setItem(CHECKOUT_DATA_KEY, JSON.stringify(payload))
+      router.push('/checkout/plata')
+    } catch (e) {
+      console.error(e)
       alert('A apărut o eroare. Te rugăm să încerci din nou.')
-    } finally {
-      setIsProcessing(false)
     }
   }
 
-  if (orderSuccess) {
+  const showSuccess = orderSuccess || placedFromUrl
+  const displayOrderNumber = orderNumber || placedFromUrl || ''
+
+  if (showSuccess) {
     return (
       <div className="section-padding bg-gray-50 min-h-screen flex items-center justify-center">
         <motion.div
@@ -157,7 +159,7 @@ export default function CheckoutPage() {
           </motion.div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Comandă Plasată cu Succes!</h2>
           <p className="text-gray-600 mb-4">
-            Număr comandă: <span className="font-bold text-primary-600">{orderNumber}</span>
+            Număr comandă: <span className="font-bold text-primary-600">{displayOrderNumber}</span>
           </p>
           <p className="text-gray-600 mb-6">
             Vei primi un email de confirmare în curând.
@@ -431,65 +433,12 @@ export default function CheckoutPage() {
                   </>
                 )}
 
-                {/* Metodă de plată */}
-                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 mt-6">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    Metodă de plată *
-                  </label>
-                  <div className="space-y-3">
-                    <label
-                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
-                        paymentMethod === 'ramburs'
-                          ? 'border-primary-600 bg-primary-50'
-                          : 'border-gray-200 bg-white hover:border-gray-300'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="payment_method"
-                        checked={paymentMethod === 'ramburs'}
-                        onChange={() => setPaymentMethod('ramburs')}
-                        className="mt-1 text-primary-600"
-                      />
-                      <div className="flex-1">
-                        <span className="font-semibold text-gray-900 flex items-center gap-2">
-                          <FiDollarSign className="w-5 h-5 text-primary-600" />
-                          La ramburs
-                        </span>
-                        <p className="text-sm text-gray-600 mt-0.5">Plătești la primirea coletului</p>
-                      </div>
-                    </label>
-                    <label
-                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
-                        paymentMethod === 'card_online'
-                          ? 'border-primary-600 bg-primary-50'
-                          : 'border-gray-200 bg-white hover:border-gray-300'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="payment_method"
-                        checked={paymentMethod === 'card_online'}
-                        onChange={() => setPaymentMethod('card_online')}
-                        className="mt-1 text-primary-600"
-                      />
-                      <div className="flex-1">
-                        <span className="font-semibold text-gray-900 flex items-center gap-2">
-                          <FiCreditCard className="w-5 h-5 text-primary-600" />
-                          Plată cu cardul online
-                        </span>
-                        <p className="text-sm text-gray-600 mt-0.5">Plată securizată cu cardul (în curând)</p>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-
                 <button
                   type="submit"
                   disabled={isProcessing}
                   className="w-full btn-primary mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isProcessing ? 'Se procesează...' : 'Plasează Comanda'}
+                  Mergi către plată
                 </button>
               </form>
             </motion.div>
