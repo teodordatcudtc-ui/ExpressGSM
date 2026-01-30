@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
@@ -32,7 +32,7 @@ interface Product {
   stock: number
 }
 
-export default function ShopPage() {
+function ShopContent() {
   const [categories, setCategories] = useState<Category[]>([])
   const [subcategories, setSubcategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
@@ -387,6 +387,25 @@ export default function ShopPage() {
       {/* Cart Component */}
       <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
+  )
+}
+
+function ShopPageFallback() {
+  return (
+    <div className="section-padding bg-gray-50 min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-gray-600">Se încarcă magazinul...</p>
+      </div>
+    </div>
+  )
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<ShopPageFallback />}>
+      <ShopContent />
+    </Suspense>
   )
 }
 

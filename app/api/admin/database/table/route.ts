@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import db from '@/lib/db'
+import { isSupabaseConfigured } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -7,6 +8,9 @@ const allowedTables = ['categories', 'products', 'orders', 'order_items']
 
 export async function GET(request: NextRequest) {
   try {
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json([])
+    }
     const { searchParams } = new URL(request.url)
     const tableName = searchParams.get('name')
 
