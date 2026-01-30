@@ -188,15 +188,15 @@ export default function ProductPage() {
             <span>Înapoi</span>
           </button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 mb-16">
-            {/* Product Image - Left Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 mb-16 lg:items-start">
+            {/* Product Image - Left Side: sticky pe PC ca poza să rămână vizibilă când descrierea e lungă */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              className="relative bg-white rounded-tl-3xl rounded-bl-3xl lg:rounded-tr-none lg:rounded-br-none flex items-center justify-center p-8 lg:p-12 min-h-[500px]"
+              className="relative bg-white rounded-tl-3xl rounded-bl-3xl lg:rounded-tr-none lg:rounded-br-none flex items-center justify-center p-8 lg:p-12 min-h-[500px] lg:sticky lg:top-24 lg:h-[calc(100vh-6rem)] lg:overflow-hidden"
             >
               <div
-                className="relative w-full max-w-md aspect-square select-none touch-pan-y"
+                className="relative w-full max-w-md aspect-square lg:aspect-auto lg:max-h-full lg:h-full select-none touch-pan-y"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
@@ -277,7 +277,7 @@ export default function ProductPage() {
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-white rounded-tr-3xl rounded-br-3xl lg:rounded-tl-none lg:rounded-bl-none p-8 lg:p-12 flex flex-col justify-center"
+              className="bg-white rounded-tr-3xl rounded-br-3xl lg:rounded-tl-none lg:rounded-bl-none p-8 lg:p-12 flex flex-col"
             >
               {/* Title */}
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{product.name}</h1>
