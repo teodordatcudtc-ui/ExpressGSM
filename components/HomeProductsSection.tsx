@@ -85,7 +85,7 @@ export default function HomeProductsSection() {
       const res = await fetch(url)
       const data = await res.json()
       let list = Array.isArray(data) ? data.filter((p: Product) => p.image) : []
-      list = list.slice(0, 12)
+      list = list.slice(0, 8)
       setProducts(list)
     } catch (e) {
       console.error(e)

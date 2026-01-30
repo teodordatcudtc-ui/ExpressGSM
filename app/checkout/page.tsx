@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
-import { FiCheckCircle, FiShoppingCart, FiUser, FiMail, FiPhone, FiMapPin, FiX, FiLogOut, FiTruck, FiPackage } from 'react-icons/fi'
+import { FiCheckCircle, FiShoppingCart, FiUser, FiMail, FiPhone, FiMapPin, FiX, FiLogOut, FiTruck, FiPackage, FiCreditCard, FiDollarSign } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
 import { useUserStore } from '@/store/userStore'
 import { counties, countries } from '@/lib/romania-data'
@@ -29,6 +29,7 @@ export default function CheckoutPage() {
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
   const [deliveryMethod, setDeliveryMethod] = useState<'curier_rapid' | 'ridicare_personala'>('curier_rapid')
+  const [paymentMethod, setPaymentMethod] = useState<'ramburs' | 'card_online'>('ramburs')
 
   const SHIPPING_COST = 28
   const PICKUP_ADDRESS = 'Pajurei 7, Sector 1, București, 011318'
@@ -110,6 +111,7 @@ export default function CheckoutPage() {
           customer_address,
           user_id: user?.id || null,
           delivery_method: deliveryMethod,
+          payment_method: paymentMethod,
           items: items.map(item => ({
             product_id: item.product_id,
             product_name: item.product_name,
@@ -428,6 +430,59 @@ export default function CheckoutPage() {
                     </div>
                   </>
                 )}
+
+                {/* Metodă de plată */}
+                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 mt-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Metodă de plată *
+                  </label>
+                  <div className="space-y-3">
+                    <label
+                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                        paymentMethod === 'ramburs'
+                          ? 'border-primary-600 bg-primary-50'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="payment_method"
+                        checked={paymentMethod === 'ramburs'}
+                        onChange={() => setPaymentMethod('ramburs')}
+                        className="mt-1 text-primary-600"
+                      />
+                      <div className="flex-1">
+                        <span className="font-semibold text-gray-900 flex items-center gap-2">
+                          <FiDollarSign className="w-5 h-5 text-primary-600" />
+                          La ramburs
+                        </span>
+                        <p className="text-sm text-gray-600 mt-0.5">Plătești la primirea coletului</p>
+                      </div>
+                    </label>
+                    <label
+                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                        paymentMethod === 'card_online'
+                          ? 'border-primary-600 bg-primary-50'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="payment_method"
+                        checked={paymentMethod === 'card_online'}
+                        onChange={() => setPaymentMethod('card_online')}
+                        className="mt-1 text-primary-600"
+                      />
+                      <div className="flex-1">
+                        <span className="font-semibold text-gray-900 flex items-center gap-2">
+                          <FiCreditCard className="w-5 h-5 text-primary-600" />
+                          Plată cu cardul online
+                        </span>
+                        <p className="text-sm text-gray-600 mt-0.5">Plată securizată cu cardul (în curând)</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
 
                 <button
                   type="submit"
