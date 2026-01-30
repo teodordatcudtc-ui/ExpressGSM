@@ -43,17 +43,19 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { customer_name, customer_email, customer_phone, customer_address, items, total_amount, user_id } = body
+    const { customer_name, customer_email, customer_phone, customer_address, items, total_amount, user_id, delivery_method } = body
 
     if (!customer_name || !customer_email || !customer_phone || !customer_address || !items || items.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    const method = delivery_method === 'ridicare_personala' ? 'ridicare_personala' : 'curier_rapid'
+
     // Generate order number
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
 
     // Insert order
-    const order = (await db.insert('orders', {
+    const orderData: Record<string, unknown> = {
       order_number: orderNumber,
       customer_name,
       customer_email,
@@ -61,7 +63,9 @@ export async function POST(request: Request) {
       customer_address,
       total_amount: parseFloat(total_amount),
       user_id: user_id ? parseInt(user_id) : null,
-    })) as any
+      delivery_method: method,
+    }
+    const order = (await db.insert('orders', orderData)) as any
 
     // Insert order items and update stock
     for (const item of items) {

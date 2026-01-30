@@ -50,7 +50,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
     const body = await request.json()
-    const { name, slug, description, price, discount, image, images, category_id, stock, active } = body
+    const { name, slug, description, price, discount, discount_type, price_reduced, image, images, category_id, stock, active } = body
 
     const imagesArray = Array.isArray(images) && images.length > 0 ? images : (image ? [image] : [])
     const primaryImage = imagesArray[0] || image || null
@@ -61,6 +61,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       description: description || null,
       price: parseFloat(price),
       discount: discount !== undefined ? parseFloat(discount) : 0,
+      discount_type: discount_type === 'fixed' ? 'fixed' : 'percent',
+      price_reduced: discount_type === 'fixed' && price_reduced != null && price_reduced !== '' ? parseFloat(price_reduced) : null,
       image: primaryImage,
       category_id: parseInt(category_id),
       stock: parseInt(stock) || 0,

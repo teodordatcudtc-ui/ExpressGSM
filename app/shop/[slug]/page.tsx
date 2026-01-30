@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { FiArrowLeft, FiPlus, FiMinus, FiShoppingCart, FiCheckCircle, FiTruck, FiShield, FiCheck } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
 import Cart from '@/components/Cart'
+import { getProductPriceInfo } from '@/lib/product-price'
 
 interface Product {
   id: number
@@ -16,6 +17,8 @@ interface Product {
   description?: string
   price: number
   discount?: number
+  discount_type?: 'percent' | 'fixed' | null
+  price_reduced?: number | null
   image?: string
   images?: string[]
   category_id: number
@@ -90,11 +93,7 @@ export default function ProductPage() {
   const handleAddToCart = () => {
     if (!product) return
 
-    // Calculate final price with discount
-    const finalPrice = product.discount && product.discount > 0
-      ? (product.price * (100 - product.discount)) / 100
-      : product.price
-
+    const { finalPrice } = getProductPriceInfo(product)
     addItem({
       product_id: product.id,
       product_name: product.name,
@@ -284,29 +283,32 @@ export default function ProductPage() {
 
               {/* Price */}
               <div className="mb-8">
-                {product.discount && product.discount > 0 ? (
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm font-bold">
-                        -{product.discount}%
-                      </span>
+                {(() => {
+                  const priceInfo = getProductPriceInfo(product)
+                  return priceInfo.hasDiscount ? (
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm font-bold">
+                          -{priceInfo.discountPercentDisplay}%
+                        </span>
+                      </div>
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-5xl font-bold text-primary-600">
+                          {priceInfo.finalPrice.toFixed(2)}
+                        </span>
+                        <span className="text-2xl text-gray-600">lei</span>
+                        <span className="text-2xl text-gray-400 line-through">
+                          {product.price} lei
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-5xl font-bold text-primary-600">
-                        {((product.price * (100 - product.discount)) / 100).toFixed(2)}
-                      </span>
-                      <span className="text-2xl text-gray-600">lei</span>
-                      <span className="text-2xl text-gray-400 line-through">
-                        {product.price} lei
-                      </span>
+                  ) : (
+                    <div>
+                      <span className="text-5xl font-bold text-primary-600">{product.price}</span>
+                      <span className="text-2xl text-gray-600 ml-2">lei</span>
                     </div>
-                  </div>
-                ) : (
-                  <div>
-                    <span className="text-5xl font-bold text-primary-600">{product.price}</span>
-                    <span className="text-2xl text-gray-600 ml-2">lei</span>
-                  </div>
-                )}
+                  )
+                })()}
               </div>
 
               {/* Technical Specifications / Description */}
@@ -438,27 +440,27 @@ export default function ProductPage() {
                       </Link>
                       <div className="mt-auto pt-4 flex items-center justify-between">
                         <div className="flex flex-col">
-                          {similarProduct.discount && similarProduct.discount > 0 ? (
-                            <>
+                          {(() => {
+                            const priceInfo = getProductPriceInfo(similarProduct)
+                            return priceInfo.hasDiscount ? (
+                              <>
+                                <span className="text-xl font-bold text-primary-600">
+                                  {priceInfo.finalPrice.toFixed(2)} RON
+                                </span>
+                                <span className="text-sm text-gray-400 line-through">
+                                  {similarProduct.price} RON
+                                </span>
+                              </>
+                            ) : (
                               <span className="text-xl font-bold text-primary-600">
-                                {((similarProduct.price * (100 - similarProduct.discount)) / 100).toFixed(2)} RON
-                              </span>
-                              <span className="text-sm text-gray-400 line-through">
                                 {similarProduct.price} RON
                               </span>
-                            </>
-                          ) : (
-                            <span className="text-xl font-bold text-primary-600">
-                              {similarProduct.price} RON
-                            </span>
-                          )}
+                            )
+                          })()}
                         </div>
                         <button
                           onClick={() => {
-                            const finalPrice = similarProduct.discount && similarProduct.discount > 0
-                              ? (similarProduct.price * (100 - similarProduct.discount)) / 100
-                              : similarProduct.price
-                            
+                            const { finalPrice } = getProductPriceInfo(similarProduct)
                             addItem({
                               product_id: similarProduct.id,
                               product_name: similarProduct.name,

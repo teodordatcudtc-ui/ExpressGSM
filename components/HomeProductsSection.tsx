@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FiShoppingBag, FiPlus, FiChevronDown } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
+import { getProductPriceInfo } from '@/lib/product-price'
 
 interface Category {
   id: number
@@ -21,6 +22,8 @@ interface Product {
   description?: string
   price: number
   discount?: number
+  discount_type?: 'percent' | 'fixed' | null
+  price_reduced?: number | null
   image?: string
   category_id: number
   category_name: string
@@ -108,13 +111,11 @@ export default function HomeProductsSection() {
   const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    const price = product.discount && product.discount > 0
-      ? (product.price * (100 - product.discount)) / 100
-      : product.price
+    const { finalPrice } = getProductPriceInfo(product)
     addItem({
       product_id: product.id,
       product_name: product.name,
-      price,
+      price: finalPrice,
       image: product.image,
       quantity: 1,
     })
@@ -229,11 +230,14 @@ export default function HomeProductsSection() {
                     ) : (
                       <FiShoppingBag className="w-12 h-12 text-gray-300" />
                     )}
-                    {product.discount && product.discount > 0 && (
-                      <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
-                        -{product.discount}%
-                      </span>
-                    )}
+                    {(() => {
+                      const priceInfo = getProductPriceInfo(product)
+                      return priceInfo.hasDiscount && (
+                        <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
+                          -{priceInfo.discountPercentDisplay}%
+                        </span>
+                      )
+                    })()}
                   </div>
                 </Link>
                 <div className="p-3 md:p-4 flex flex-col flex-grow">
@@ -245,10 +249,7 @@ export default function HomeProductsSection() {
                   </Link>
                   <div className="mt-auto pt-3 flex items-end justify-between gap-2 min-h-[44px]">
                     <span className="font-bold text-primary-600 text-sm md:text-base">
-                      {product.discount && product.discount > 0
-                        ? ((product.price * (100 - product.discount)) / 100).toFixed(2)
-                        : product.price.toFixed(2)}{' '}
-                      RON
+                      {getProductPriceInfo(product).finalPrice.toFixed(2)} RON
                     </span>
                     <button
                       type="button"

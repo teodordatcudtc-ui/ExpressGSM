@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { FiShoppingBag, FiPlus } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
 import Cart from '@/components/Cart'
+import { getProductPriceInfo } from '@/lib/product-price'
 
 interface Category {
   id: number
@@ -26,6 +27,8 @@ interface Product {
   description?: string
   price: number
   discount?: number
+  discount_type?: 'percent' | 'fixed' | null
+  price_reduced?: number | null
   image?: string
   category_id: number
   category_name: string
@@ -188,10 +191,11 @@ function ShopContent() {
   }
 
   const handleAddToCart = (product: Product) => {
+    const { finalPrice } = getProductPriceInfo(product)
     addItem({
       product_id: product.id,
       product_name: product.name,
-      price: product.price,
+      price: finalPrice,
       image: product.image,
       quantity: 1,
     })
@@ -332,21 +336,27 @@ function ShopContent() {
                         </div>
                       )}
                       {/* Discount Badge */}
-                      {product.discount && product.discount > 0 && (
-                        <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-lg z-10">
-                          -{product.discount}%
-                        </div>
-                      )}
+                      {(() => {
+                        const priceInfo = getProductPriceInfo(product)
+                        return priceInfo.hasDiscount && (
+                          <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-lg z-10">
+                            -{priceInfo.discountPercentDisplay}%
+                          </div>
+                        )
+                      })()}
                       {/* Price Badge */}
                       <div className="absolute top-2 right-2 bg-primary-600 text-white px-2 py-1 rounded text-sm font-semibold">
-                        {product.discount && product.discount > 0 ? (
-                          <div className="flex flex-col items-end">
-                            <span className="line-through text-xs opacity-75">{product.price} RON</span>
-                            <span>{((product.price * (100 - product.discount)) / 100).toFixed(2)} RON</span>
-                          </div>
-                        ) : (
-                          <div>{product.price} RON</div>
-                        )}
+                        {(() => {
+                          const priceInfo = getProductPriceInfo(product)
+                          return priceInfo.hasDiscount ? (
+                            <div className="flex flex-col items-end">
+                              <span className="line-through text-xs opacity-75">{product.price} RON</span>
+                              <span>{priceInfo.finalPrice.toFixed(2)} RON</span>
+                            </div>
+                          ) : (
+                            <div>{product.price} RON</div>
+                          )
+                        })()}
                       </div>
                     </div>
                   </Link>

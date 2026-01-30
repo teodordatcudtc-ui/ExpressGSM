@@ -24,6 +24,7 @@ interface Order {
   status: string
   payment_status: string
   created_at: string
+  delivery_method?: 'curier_rapid' | 'ridicare_personala' | null
   items: OrderItem[]
 }
 
@@ -147,8 +148,16 @@ export default function OrderDetailPage() {
                 <p className="text-sm text-gray-600">Telefon</p>
                 <p className="font-semibold break-words">{order.customer_phone}</p>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Adresă</p>
+              <div className="sm:col-span-2">
+                <p className="text-sm text-gray-600">Metodă livrare</p>
+                <p className="font-semibold break-words">
+                  {order.delivery_method === 'ridicare_personala'
+                    ? 'Ridicare personală din depozit (Pajurei 7, Sector 1, București, 011318)'
+                    : 'Curier rapid – Livrare la adresă (28,00 lei)'}
+                </p>
+              </div>
+              <div className="sm:col-span-2">
+                <p className="text-sm text-gray-600">Adresă / Locație livrare</p>
                 <p className="font-semibold break-words">{order.customer_address}</p>
               </div>
             </div>

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
-import { FiCheckCircle, FiShoppingCart, FiUser, FiMail, FiPhone, FiMapPin, FiX, FiLogOut } from 'react-icons/fi'
+import { FiCheckCircle, FiShoppingCart, FiUser, FiMail, FiPhone, FiMapPin, FiX, FiLogOut, FiTruck, FiPackage } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
 import { useUserStore } from '@/store/userStore'
 import { counties, countries } from '@/lib/romania-data'
@@ -28,6 +28,10 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
+  const [deliveryMethod, setDeliveryMethod] = useState<'curier_rapid' | 'ridicare_personala'>('curier_rapid')
+
+  const SHIPPING_COST = 28
+  const PICKUP_ADDRESS = 'Pajurei 7, Sector 1, București, 011318'
   
   const {
     register,
@@ -64,7 +68,9 @@ export default function CheckoutPage() {
     }
   }, [isAuthenticated, user, setValue, fetchUserData])
 
-  const total = getTotal()
+  const subtotal = getTotal()
+  const shippingCost = deliveryMethod === 'curier_rapid' ? SHIPPING_COST : 0
+  const total = subtotal + shippingCost
 
   if (items.length === 0 && !orderSuccess) {
     return (
@@ -87,9 +93,10 @@ export default function CheckoutPage() {
     setIsProcessing(true)
 
     try {
-      // Combine first_name and last_name for customer_name
       const customer_name = `${data.first_name} ${data.last_name}`
-      const customer_address = `${data.customer_address}, ${data.city}, ${data.county}, ${data.country}`
+      const customer_address = deliveryMethod === 'ridicare_personala'
+        ? `Ridicare personală - ${PICKUP_ADDRESS}`
+        : `${data.customer_address}, ${data.city}, ${data.county}, ${data.country}`
 
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -102,6 +109,7 @@ export default function CheckoutPage() {
           customer_phone: data.customer_phone,
           customer_address,
           user_id: user?.id || null,
+          delivery_method: deliveryMethod,
           items: items.map(item => ({
             product_id: item.product_id,
             product_name: item.product_name,
@@ -290,77 +298,136 @@ export default function CheckoutPage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Țară *
-                    </label>
-                    <select
-                      {...register('country', { required: 'Țara este obligatorie' })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                    >
-                      {countries.map((country) => (
-                        <option key={country} value={country}>
-                          {country}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.country && (
-                      <p className="text-red-600 text-sm mt-1">{errors.country.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Județ *
-                    </label>
-                    <select
-                      {...register('county', { required: 'Județul este obligatoriu' })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                    >
-                      <option value="">Selectează județul</option>
-                      {counties.map((county) => (
-                        <option key={county} value={county}>
-                          {county}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.county && (
-                      <p className="text-red-600 text-sm mt-1">{errors.county.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Localitate *
+                {/* Metodă livrare */}
+                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Metodă de livrare *
                   </label>
-                  <input
-                    type="text"
-                    {...register('city', { required: 'Localitatea este obligatorie' })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                    placeholder="Introdu localitatea"
-                  />
-                  {errors.city && (
-                    <p className="text-red-600 text-sm mt-1">{errors.city.message}</p>
-                  )}
+                  <div className="space-y-3">
+                    <label
+                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                        deliveryMethod === 'curier_rapid'
+                          ? 'border-primary-600 bg-primary-50'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="delivery_method"
+                        checked={deliveryMethod === 'curier_rapid'}
+                        onChange={() => setDeliveryMethod('curier_rapid')}
+                        className="mt-1 text-primary-600"
+                      />
+                      <div className="flex-1">
+                        <span className="font-semibold text-gray-900 flex items-center gap-2">
+                          <FiTruck className="w-5 h-5 text-primary-600" />
+                          Curier rapid – Livrare la adresă
+                        </span>
+                        <p className="text-sm text-gray-600 mt-0.5">28,00 lei</p>
+                      </div>
+                    </label>
+                    <label
+                      className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                        deliveryMethod === 'ridicare_personala'
+                          ? 'border-primary-600 bg-primary-50'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="delivery_method"
+                        checked={deliveryMethod === 'ridicare_personala'}
+                        onChange={() => setDeliveryMethod('ridicare_personala')}
+                        className="mt-1 text-primary-600"
+                      />
+                      <div className="flex-1">
+                        <span className="font-semibold text-gray-900 flex items-center gap-2">
+                          <FiPackage className="w-5 h-5 text-primary-600" />
+                          Ridicare personală din depozit
+                        </span>
+                        <p className="text-sm text-gray-600 mt-0.5">
+                          Pajurei 7, Sector 1, București, 011318 – gratuit
+                        </p>
+                      </div>
+                    </label>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <FiMapPin className="w-4 h-4" />
-                    Adresă de Livrare *
-                  </label>
-                  <textarea
-                    {...register('customer_address', { required: 'Adresa este obligatorie' })}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                    placeholder="Strada, Număr, Bloc, Scara, Etaj, Apartament"
-                  />
-                  {errors.customer_address && (
-                    <p className="text-red-600 text-sm mt-1">{errors.customer_address.message}</p>
-                  )}
-                </div>
+                {deliveryMethod === 'curier_rapid' && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Țară *
+                        </label>
+                        <select
+                          {...register('country', { required: 'Țara este obligatorie' })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                        >
+                          {countries.map((country) => (
+                            <option key={country} value={country}>
+                              {country}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.country && (
+                          <p className="text-red-600 text-sm mt-1">{errors.country.message}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Județ *
+                        </label>
+                        <select
+                          {...register('county', { required: 'Județul este obligatoriu' })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                        >
+                          <option value="">Selectează județul</option>
+                          {counties.map((county) => (
+                            <option key={county} value={county}>
+                              {county}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.county && (
+                          <p className="text-red-600 text-sm mt-1">{errors.county.message}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Localitate *
+                      </label>
+                      <input
+                        type="text"
+                        {...register('city', { required: 'Localitatea este obligatorie' })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                        placeholder="Introdu localitatea"
+                      />
+                      {errors.city && (
+                        <p className="text-red-600 text-sm mt-1">{errors.city.message}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <FiMapPin className="w-4 h-4" />
+                        Adresă de Livrare *
+                      </label>
+                      <textarea
+                        {...register('customer_address', { required: 'Adresa este obligatorie' })}
+                        rows={3}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                        placeholder="Strada, Număr, Bloc, Scara, Etaj, Apartament"
+                      />
+                      {errors.customer_address && (
+                        <p className="text-red-600 text-sm mt-1">{errors.customer_address.message}</p>
+                      )}
+                    </div>
+                  </>
+                )}
 
                 <button
                   type="submit"
@@ -406,12 +473,20 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <div className="border-t pt-4">
-                <div className="flex justify-between text-xl font-bold mb-4">
+              <div className="border-t pt-4 space-y-2">
+                <div className="flex justify-between text-gray-700">
+                  <span>Subtotal produse:</span>
+                  <span>{subtotal.toFixed(2)} RON</span>
+                </div>
+                <div className="flex justify-between text-gray-700">
+                  <span>Livrare ({deliveryMethod === 'curier_rapid' ? 'Curier rapid' : 'Ridicare personală'}):</span>
+                  <span>{shippingCost === 0 ? 'Gratuit' : `${shippingCost.toFixed(2)} RON`}</span>
+                </div>
+                <div className="flex justify-between text-xl font-bold pt-2 border-t mt-2">
                   <span>Total:</span>
                   <span className="text-primary-600">{total.toFixed(2)} RON</span>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 pt-2">
                   * Plata se va efectua la livrare (ramburs)
                 </p>
               </div>

@@ -23,6 +23,8 @@ interface Product {
   description?: string
   price: number
   discount?: number
+  discount_type?: 'percent' | 'fixed' | null
+  price_reduced?: number | null
   image?: string
   images?: string[]
   category_id: number
@@ -56,7 +58,9 @@ function AdminDashboardContent() {
     slug: '',
     description: '',
     price: '',
+    discount_type: 'percent' as 'percent' | 'fixed',
     discount: '0',
+    price_reduced: '',
     image: '',
     images: [] as string[],
     category_id: '',
@@ -219,7 +223,9 @@ function AdminDashboardContent() {
           image: primaryImage,
           images: imagesList,
           price: parseFloat(formData.price),
-          discount: parseFloat(formData.discount || '0') || 0,
+          discount_type: formData.discount_type,
+          discount: formData.discount_type === 'percent' ? (parseFloat(formData.discount || '0') || 0) : 0,
+          price_reduced: formData.discount_type === 'fixed' && formData.price_reduced !== '' ? parseFloat(formData.price_reduced) : null,
           stock: parseInt(formData.stock),
           active: true,
         }),
@@ -246,12 +252,17 @@ function AdminDashboardContent() {
     const imagesList = Array.isArray((product as Product).images) && (product as Product).images!.length > 0
       ? (product as Product).images!
       : (product.image ? [product.image] : [])
+    const discountType = (product as Product).discount_type || 'percent'
+    const pr = (product as Product).price_reduced
+    const hasPriceReduced = pr != null && pr > 0
     setFormData({
       name: product.name,
       slug: product.slug,
       description: product.description || '',
       price: product.price.toString(),
+      discount_type: hasPriceReduced ? 'fixed' : discountType,
       discount: (product.discount || 0).toString(),
+      price_reduced: (product as Product).price_reduced != null ? String((product as Product).price_reduced) : '',
       image: product.image || imagesList[0] || '',
       images: imagesList,
       category_id: product.category_id.toString(),
@@ -291,7 +302,9 @@ function AdminDashboardContent() {
       slug: '',
       description: '',
       price: '',
+      discount_type: 'percent',
       discount: '0',
+      price_reduced: '',
       image: '',
       images: [],
       category_id: '',
@@ -451,22 +464,61 @@ function AdminDashboardContent() {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Reducere (%)
+                          Reducere
                         </label>
-                        <input
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          max="100"
-                          value={formData.discount === '' ? '' : (formData.discount || '0')}
-                          onChange={(e) => {
-                            const value = e.target.value
-                            setFormData({ ...formData, discount: value === '' ? '' : value })
-                          }}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
-                          placeholder="0"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">Lăsați gol sau 0 pentru fără reducere</p>
+                        <div className="flex gap-4 mb-2">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="discount_type"
+                              checked={formData.discount_type === 'percent'}
+                              onChange={() => setFormData({ ...formData, discount_type: 'percent', price_reduced: '' })}
+                              className="text-primary-600"
+                            />
+                            <span>Procent (%)</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="discount_type"
+                              checked={formData.discount_type === 'fixed'}
+                              onChange={() => setFormData({ ...formData, discount_type: 'fixed', discount: '0' })}
+                              className="text-primary-600"
+                            />
+                            <span>Preț redus (RON)</span>
+                          </label>
+                        </div>
+                        {formData.discount_type === 'percent' ? (
+                          <>
+                            <input
+                              type="number"
+                              step="1"
+                              min="0"
+                              max="100"
+                              value={formData.discount === '' ? '' : (formData.discount || '0')}
+                              onChange={(e) => {
+                                const value = e.target.value
+                                setFormData({ ...formData, discount: value === '' ? '' : value })
+                              }}
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
+                              placeholder="0"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Procent reducere (fără zecimale). Gol sau 0 = fără reducere</p>
+                          </>
+                        ) : (
+                          <>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={formData.price_reduced}
+                              onChange={(e) => setFormData({ ...formData, price_reduced: e.target.value })}
+                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
+                              placeholder="Prețul nou (ex: 199.99)"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Prețul final redus (RON). Gol = fără reducere</p>
+                          </>
+                        )}
                       </div>
                     </div>
                     <div>
