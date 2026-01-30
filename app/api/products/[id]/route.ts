@@ -30,10 +30,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     const dataTyped = data as any
     const category = dataTyped.categories
+    const images = Array.isArray(dataTyped.images) && dataTyped.images.length > 0
+      ? dataTyped.images
+      : (dataTyped.image ? [dataTyped.image] : [])
     const product = {
       ...dataTyped,
       category_name: category?.name,
       category_slug: category?.slug,
+      images,
     }
 
     return NextResponse.json(product)
@@ -46,7 +50,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
     const body = await request.json()
-    const { name, slug, description, price, discount, image, category_id, stock, active } = body
+    const { name, slug, description, price, discount, image, images, category_id, stock, active } = body
+
+    const imagesArray = Array.isArray(images) && images.length > 0 ? images : (image ? [image] : [])
+    const primaryImage = imagesArray[0] || image || null
 
     const updateData: Record<string, any> = {
       name,
@@ -54,9 +61,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       description: description || null,
       price: parseFloat(price),
       discount: discount !== undefined ? parseFloat(discount) : 0,
-      image: image || null,
+      image: primaryImage,
       category_id: parseInt(category_id),
       stock: parseInt(stock) || 0,
+    }
+    if (imagesArray.length >= 0) {
+      updateData.images = imagesArray
     }
 
     if (active !== undefined) {

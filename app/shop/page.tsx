@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -39,7 +40,26 @@ export default function ShopPage() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<number | null>(null)
   const [lastSelectedCategory, setLastSelectedCategory] = useState<number | null>(null)
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const categoryFromUrlApplied = useRef(false)
+  const searchParams = useSearchParams()
   const { addItem, getItemCount } = useCartStore()
+
+  useEffect(() => {
+    const q = searchParams.get('q')
+    if (q != null) setSearchQuery(q)
+  }, [searchParams])
+
+  useEffect(() => {
+    if (categories.length === 0 || categoryFromUrlApplied.current) return
+    const categorySlug = searchParams.get('category')
+    if (!categorySlug) return
+    const cat = categories.find((c: Category) => c.slug === categorySlug)
+    if (cat) {
+      setSelectedCategory(cat.id)
+      categoryFromUrlApplied.current = true
+    }
+  }, [categories, searchParams])
 
   useEffect(() => {
     fetchCategories()
@@ -177,6 +197,12 @@ export default function ShopPage() {
     })
   }
 
+  const filteredProducts = !searchQuery.trim()
+    ? products
+    : (products || []).filter((p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+      )
+
   return (
     <>
       <div className="section-padding bg-gray-50 min-h-screen">
@@ -261,15 +287,26 @@ export default function ShopPage() {
             )}
           </div>
 
+          {/* Search query display - when coming from header search */}
+          {searchQuery.trim() && (
+            <p className="text-center text-gray-600 mb-4">
+              Căutare: &quot;{searchQuery}&quot; — {filteredProducts.length} rezultat(e)
+            </p>
+          )}
+
           {/* Products Grid */}
-          {!products || !Array.isArray(products) || products.length === 0 ? (
+          {!filteredProducts || filteredProducts.length === 0 ? (
             <div className="text-center py-12">
               <FiShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">Nu există produse în această categorie</p>
+              <p className="text-gray-500 text-lg">
+                {searchQuery.trim()
+                  ? `Niciun produs găsit pentru „${searchQuery}"`
+                  : 'Nu există produse în această categorie'}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product: Product, index: number) => (
+              {filteredProducts.map((product: Product, index: number) => (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 30 }}

@@ -17,6 +17,7 @@ interface Product {
   price: number
   discount?: number
   image?: string
+  images?: string[]
   category_id: number
   category_name: string
   category_slug: string
@@ -32,6 +33,9 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
+  const [imageIndex, setImageIndex] = useState(0)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
   const { addItem } = useCartStore()
 
   useEffect(() => {
@@ -116,6 +120,35 @@ export default function ProductPage() {
     }
   }
 
+  // Normalize images array (API returns images or fallback to single image)
+  const productImages = product
+    ? (Array.isArray(product.images) && product.images.length > 0
+        ? product.images
+        : product.image
+          ? [product.image]
+          : [])
+    : []
+
+  const goToPrevImage = () => {
+    setImageIndex((i) => (i <= 0 ? productImages.length - 1 : i - 1))
+  }
+  const goToNextImage = () => {
+    setImageIndex((i) => (i >= productImages.length - 1 ? 0 : i + 1))
+  }
+
+  const minSwipeDistance = 50
+  const onTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX)
+  const onTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX)
+  const onTouchEnd = () => {
+    if (touchStart == null || touchEnd == null) return
+    const distance = touchStart - touchEnd
+    if (Math.abs(distance) < minSwipeDistance) return
+    if (distance > 0) goToNextImage()
+    else goToPrevImage()
+    setTouchStart(null)
+    setTouchEnd(null)
+  }
+
   if (loading) {
     return (
       <div className="section-padding bg-gray-50 min-h-screen flex items-center justify-center">
@@ -162,20 +195,65 @@ export default function ProductPage() {
               animate={{ opacity: 1, x: 0 }}
               className="relative bg-white rounded-tl-3xl rounded-bl-3xl lg:rounded-tr-none lg:rounded-br-none flex items-center justify-center p-8 lg:p-12 min-h-[500px]"
             >
-              {/* Discount Badge - Optional, can be removed if not needed */}
-              {/* <div className="absolute top-6 right-6 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-                -10%
-              </div> */}
-              
-              <div className="relative w-full max-w-md aspect-square">
-                {product.image ? (
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
+              <div
+                className="relative w-full max-w-md aspect-square select-none touch-pan-y"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
+                {productImages.length > 0 ? (
+                  <>
+                    {productImages.map((src, i) => (
+                      <div
+                        key={i}
+                        className="absolute inset-0 transition-opacity duration-300"
+                        style={{ opacity: i === imageIndex ? 1 : 0, pointerEvents: i === imageIndex ? 'auto' : 'none' }}
+                      >
+                        <Image
+                          src={src}
+                          alt={`${product.name} - imagine ${i + 1}`}
+                          fill
+                          className="object-contain"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          priority={i === 0}
+                          unoptimized={src.startsWith('data:') || src.includes('supabase')}
+                        />
+                      </div>
+                    ))}
+                    {productImages.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={goToPrevImage}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center text-gray-800 hover:bg-white z-10"
+                          aria-label="Imaginea anterioară"
+                        >
+                          ‹
+                        </button>
+                        <button
+                          type="button"
+                          onClick={goToNextImage}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center text-gray-800 hover:bg-white z-10"
+                          aria-label="Imaginea următoare"
+                        >
+                          ›
+                        </button>
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                          {productImages.map((_, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => setImageIndex(i)}
+                              className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                                i === imageIndex ? 'bg-primary-600 scale-110' : 'bg-gray-300'
+                              }`}
+                              aria-label={`Imagine ${i + 1}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-white/50 rounded-2xl">
                     <div className="w-32 h-40 bg-gray-800 rounded-2xl p-3 shadow-xl">
@@ -184,11 +262,7 @@ export default function ProductPage() {
                           <div
                             key={i}
                             className={`rounded-lg ${
-                              i % 3 === 0
-                                ? 'bg-orange-400'
-                                : i % 3 === 1
-                                ? 'bg-yellow-400'
-                                : 'bg-blue-500'
+                              i % 3 === 0 ? 'bg-orange-400' : i % 3 === 1 ? 'bg-yellow-400' : 'bg-blue-500'
                             }`}
                           />
                         ))}

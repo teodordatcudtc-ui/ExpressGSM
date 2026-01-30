@@ -24,6 +24,7 @@ interface Product {
   price: number
   discount?: number
   image?: string
+  images?: string[]
   category_id: number
   category_name: string
   stock: number
@@ -57,6 +58,7 @@ function AdminDashboardContent() {
     price: '',
     discount: '0',
     image: '',
+    images: [] as string[],
     category_id: '',
     stock: '1',
   })
@@ -64,6 +66,7 @@ function AdminDashboardContent() {
   const [imagePreview, setImagePreview] = useState<string>('')
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const multiFileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetchProducts()
@@ -126,22 +129,51 @@ function AdminDashboardContent() {
     const file = e.target.files?.[0]
     if (file) {
       setSelectedImage(file)
-      // Create preview
       const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
+      reader.onloadend = () => setImagePreview(reader.result as string)
       reader.readAsDataURL(file)
     }
+  }
+
+  const handleMultipleImagesSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files?.length) return
+    setIsUploading(true)
+    try {
+      const urls: string[] = []
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadImage(files[i])
+        urls.push(url)
+      }
+      setFormData((prev) => ({
+        ...prev,
+        images: [...prev.images, ...urls],
+        image: prev.images.length === 0 && urls.length > 0 ? urls[0] : prev.image,
+      }))
+      if (multiFileInputRef.current) multiFileInputRef.current.value = ''
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Eroare la încărcare imagini')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleRemoveImageAtIndex = (index: number) => {
+    setFormData((prev) => {
+      const next = prev.images.filter((_, i) => i !== index)
+      return {
+        ...prev,
+        images: next,
+        image: next[0] || '',
+      }
+    })
   }
 
   const handleRemoveImage = () => {
     setSelectedImage(null)
     setImagePreview('')
-    setFormData({ ...formData, image: '' })
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
+    setFormData((prev) => ({ ...prev, image: prev.images[0] || '', images: prev.images }))
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const uploadImage = async (file: File): Promise<string> => {
@@ -167,12 +199,12 @@ function AdminDashboardContent() {
     setIsUploading(true)
 
     try {
-      let imageUrl = formData.image
-
-      // Upload new image if selected
+      let imagesList = [...formData.images]
       if (selectedImage) {
-        imageUrl = await uploadImage(selectedImage)
+        const url = await uploadImage(selectedImage)
+        imagesList = [...imagesList, url]
       }
+      const primaryImage = imagesList[0] || formData.image
 
       const url = editingProduct
         ? `/api/products/${editingProduct.id}`
@@ -184,7 +216,8 @@ function AdminDashboardContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          image: imageUrl,
+          image: primaryImage,
+          images: imagesList,
           price: parseFloat(formData.price),
           discount: parseFloat(formData.discount || '0') || 0,
           stock: parseInt(formData.stock),
@@ -208,20 +241,24 @@ function AdminDashboardContent() {
   }
 
   const handleEditProduct = (product: Product) => {
-    fetchCategories() // Reîncarcă categoriile când se deschide formularul
+    fetchCategories()
     setEditingProduct(product)
+    const imagesList = Array.isArray((product as Product).images) && (product as Product).images!.length > 0
+      ? (product as Product).images!
+      : (product.image ? [product.image] : [])
     setFormData({
       name: product.name,
       slug: product.slug,
       description: product.description || '',
       price: product.price.toString(),
       discount: (product.discount || 0).toString(),
-      image: product.image || '',
+      image: product.image || imagesList[0] || '',
+      images: imagesList,
       category_id: product.category_id.toString(),
       stock: product.stock.toString(),
     })
     setSelectedImage(null)
-    setImagePreview(product.image || '')
+    setImagePreview('')
     setShowProductForm(true)
   }
 
@@ -256,6 +293,7 @@ function AdminDashboardContent() {
       price: '',
       discount: '0',
       image: '',
+      images: [],
       category_id: '',
       stock: '1',
     })
@@ -263,9 +301,8 @@ function AdminDashboardContent() {
     setSelectedImage(null)
     setImagePreview('')
     setShowProductForm(false)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
+    if (multiFileInputRef.current) multiFileInputRef.current.value = ''
   }
 
   const generateSlug = (name: string) => {
@@ -481,61 +518,77 @@ function AdminDashboardContent() {
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Imagine Produs
+                        Imagini Produs (poți adăuga mai multe)
                       </label>
                       
-                      {/* Image Preview */}
-                      {(imagePreview || formData.image) && (
-                        <div className="relative mb-4 w-full h-48 bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-300">
-                          {imagePreview ? (
-                            // Preview from file selection (data URL)
-                            <img
-                              src={imagePreview}
-                              alt="Preview"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            // Preview from existing image URL
-                            <Image
-                              src={formData.image}
-                              alt="Preview"
-                              fill
-                              className="object-cover"
-                              unoptimized
-                            />
-                          )}
+                      {/* List of images with remove */}
+                      {formData.images.length > 0 && (
+                        <div className="flex flex-wrap gap-3 mb-4">
+                          {formData.images.map((img, index) => (
+                            <div key={index} className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-gray-300 bg-gray-100">
+                              <img src={img} alt="" className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveImageAtIndex(index)}
+                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                              >
+                                <FiX className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Single file (preview before adding to list) */}
+                      {selectedImage && (
+                        <div className="relative mb-4 w-full h-32 bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-300 flex items-center justify-center">
+                          <img src={imagePreview} alt="Preview" className="max-h-full object-contain" />
                           <button
                             type="button"
-                            onClick={handleRemoveImage}
-                            className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                            onClick={() => { setSelectedImage(null); setImagePreview(''); if (fileInputRef.current) fileInputRef.current.value = '' }}
+                            className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full"
                           >
                             <FiX className="w-4 h-4" />
                           </button>
                         </div>
                       )}
 
-                      {/* File Input */}
-                      <div className="relative">
+                      {/* Add image(s) - multiple files */}
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <input
+                          ref={multiFileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                          multiple
+                          onChange={handleMultipleImagesSelect}
+                          className="hidden"
+                          id="images-upload-multi"
+                        />
+                        <label
+                          htmlFor="images-upload-multi"
+                          className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-600 hover:bg-primary-50 transition-colors text-sm font-semibold text-gray-700"
+                        >
+                          <FiUpload className="w-5 h-5" />
+                          Adaugă imagini
+                        </label>
                         <input
                           ref={fileInputRef}
                           type="file"
                           accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
                           onChange={handleImageSelect}
                           className="hidden"
-                          id="image-upload"
+                          id="image-upload-one"
                         />
                         <label
-                          htmlFor="image-upload"
-                          className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-600 hover:bg-primary-50 transition-colors"
+                          htmlFor="image-upload-one"
+                          className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-600 hover:bg-primary-50 transition-colors text-sm font-semibold text-gray-700"
                         >
-                          <FiUpload className="w-5 h-5 text-gray-600" />
-                          <span className="text-sm font-semibold text-gray-700">
-                            {imagePreview || formData.image ? 'Schimbă Imaginea' : 'Selectează Imagine'}
-                          </span>
+                          <FiUpload className="w-5 h-5" />
+                          O imagine
                         </label>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Formate acceptate: JPG, PNG, WEBP, GIF (max 5MB)
+                      <p className="text-xs text-gray-500">
+                        Formate: JPG, PNG, WEBP, GIF (max 5MB). Pe pagina produsului clienții pot da swipe prin toate imaginile.
                       </p>
                     </div>
                     <div className="flex gap-4 pt-4">
@@ -565,68 +618,128 @@ function AdminDashboardContent() {
               </div>
             )}
 
-            {/* Products List */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Produs</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Categorie</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Preț</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Stoc</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Acțiuni</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {products && Array.isArray(products) && products.map((product) => (
-                    <tr key={product.id} className={`hover:bg-gray-50 ${product.active === 0 ? 'opacity-60 bg-gray-50' : ''}`}>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          {product.image && (
-                            <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded" />
-                          )}
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className={`font-semibold ${product.active === 0 ? 'text-gray-500' : 'text-gray-900'}`}>
-                                {product.name}
-                              </p>
-                              {product.active === 0 && (
-                                <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded font-semibold">
-                                  Dezactivat
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-500">{product.slug}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-700">{product.category_name}</td>
-                      <td className="px-6 py-4 font-bold text-primary-600">{product.price} RON</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded text-sm ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                          {product.stock}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleEditProduct(product)}
-                            className="p-2 hover:bg-blue-100 text-blue-600 rounded"
-                          >
-                            <FiEdit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteProduct(product.id)}
-                            className="p-2 hover:bg-red-100 text-red-600 rounded"
-                          >
-                            <FiTrash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
+            {/* Products List - Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {products && Array.isArray(products) && products.map((product) => (
+                <div
+                  key={product.id}
+                  className={`bg-white rounded-xl shadow-lg p-4 ${product.active === 0 ? 'opacity-60' : ''}`}
+                >
+                  <div className="flex gap-3 mb-3">
+                    {product.image && (
+                      <img src={product.image} alt={product.name} className="w-14 h-14 object-cover rounded-lg flex-shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className={`font-semibold text-gray-900 ${product.active === 0 ? 'text-gray-500' : ''}`}>
+                          {product.name}
+                        </p>
+                        {product.active === 0 && (
+                          <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded font-semibold">
+                            Dezactivat
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500">{product.category_name}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 flex-wrap mb-3">
+                    <span className="font-bold text-primary-600">{product.price} RON</span>
+                    <span className={`px-2 py-1 rounded text-sm font-semibold ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      Stoc: {product.stock}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleEditProduct(product)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-100 text-blue-600 rounded-lg font-semibold"
+                    >
+                      <FiEdit className="w-4 h-4" />
+                      Editează
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteProduct(product.id)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-100 text-red-600 rounded-lg font-semibold"
+                    >
+                      <FiTrash2 className="w-4 h-4" />
+                      Șterge
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {(!products || !Array.isArray(products) || products.length === 0) && (
+                <div className="bg-white rounded-xl shadow-lg p-8 text-center text-gray-600">
+                  Nu există produse. Adaugă un produs nou.
+                </div>
+              )}
+            </div>
+
+            {/* Products List - Desktop Table */}
+            <div className="hidden md:block bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Produs</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Categorie</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Preț</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Stoc</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Acțiuni</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {products && Array.isArray(products) && products.map((product) => (
+                      <tr key={product.id} className={`hover:bg-gray-50 ${product.active === 0 ? 'opacity-60 bg-gray-50' : ''}`}>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            {product.image && (
+                              <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded" />
+                            )}
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className={`font-semibold ${product.active === 0 ? 'text-gray-500' : 'text-gray-900'}`}>
+                                  {product.name}
+                                </p>
+                                {product.active === 0 && (
+                                  <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded font-semibold">
+                                    Dezactivat
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm text-gray-500">{product.slug}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">{product.category_name}</td>
+                        <td className="px-6 py-4 font-bold text-primary-600">{product.price} RON</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 rounded text-sm ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                            {product.stock}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleEditProduct(product)}
+                              className="p-2 hover:bg-blue-100 text-blue-600 rounded"
+                            >
+                              <FiEdit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="p-2 hover:bg-red-100 text-red-600 rounded"
+                            >
+                              <FiTrash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}

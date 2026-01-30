@@ -2,19 +2,22 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiMenu, FiX, FiPhone, FiTool, FiShoppingBag, FiInfo, FiMail, FiShoppingCart, FiUser } from 'react-icons/fi'
+import { FiMenu, FiX, FiPhone, FiTool, FiShoppingBag, FiInfo, FiMail, FiShoppingCart, FiUser, FiSearch } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
 import { useUserStore } from '@/store/userStore'
 import Cart from '@/components/Cart'
+import CartFloatingPopup from '@/components/CartFloatingPopup'
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const pathname = usePathname()
+  const router = useRouter()
   const { getItemCount } = useCartStore()
   const { isAuthenticated } = useUserStore()
   const cartItemCount = getItemCount()
@@ -128,6 +131,32 @@ export default function Header() {
           </div>
         </div>
 
+        {/* Mobile Search Bar - below header row */}
+        <div className="md:hidden border-t border-gray-100 px-4 py-3 bg-white">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              const q = searchQuery.trim()
+              if (q) router.push(`/shop?q=${encodeURIComponent(q)}`)
+              else router.push('/shop')
+            }}
+            className="flex items-center gap-2 w-full bg-gray-100 rounded-xl px-4 py-2.5"
+          >
+            <FiSearch className="w-5 h-5 text-gray-500 flex-shrink-0" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Caută produsul dorit..."
+              className="flex-1 bg-transparent border-0 outline-none text-gray-900 placeholder:text-gray-500 text-base"
+              aria-label="Caută produse"
+            />
+            <button type="submit" className="text-primary-600 font-semibold text-sm">
+              Caută
+            </button>
+          </form>
+        </div>
+
         {/* Mobile Menu */}
         <AnimatePresence>
           {isMobileMenuOpen && (
@@ -181,11 +210,14 @@ export default function Header() {
         </AnimatePresence>
       </motion.header>
 
-      {/* Spacer for fixed header */}
-      <div className="h-20" />
+      {/* Spacer for fixed header (taller on mobile when search bar is visible) */}
+      <div className="h-32 md:h-20" />
 
       {/* Cart Component */}
       <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      {/* Floating cart popup - bottom right when cart has items */}
+      <CartFloatingPopup onOpenCart={() => setIsCartOpen(true)} />
     </>
   )
 }

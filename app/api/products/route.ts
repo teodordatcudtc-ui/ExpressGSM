@@ -55,14 +55,18 @@ export async function GET(request: Request) {
 
     if (error) throw error
 
-    // Transform to match expected format
+    // Transform to match expected format (include images array for multiple images)
     const products = (data || []).map((product: any) => {
       const category = product.categories
+      const images = Array.isArray(product.images) && product.images.length > 0
+        ? product.images
+        : (product.image ? [product.image] : [])
       return {
         ...product,
         category_name: category?.name,
         category_slug: category?.slug,
         category_parent_id: category?.parent_id,
+        images,
       }
     })
 
@@ -76,22 +80,28 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, slug, description, price, discount, image, category_id, stock, active } = body
+    const { name, slug, description, price, discount, image, images, category_id, stock, active } = body
 
     if (!name || !slug || !price || !category_id) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const productData = {
+    const imagesArray = Array.isArray(images) && images.length > 0 ? images : (image ? [image] : [])
+    const primaryImage = imagesArray[0] || image || null
+
+    const productData: Record<string, unknown> = {
       name,
       slug,
       description: description || null,
       price: parseFloat(price),
       discount: discount !== undefined ? parseFloat(discount) : 0,
-      image: image || null,
+      image: primaryImage,
       category_id: parseInt(category_id),
       stock: parseInt(stock) || 0,
       active: active !== undefined ? (active ? 1 : 0) : 1,
+    }
+    if (imagesArray.length > 0) {
+      productData.images = imagesArray
     }
 
     const product = (await db.insert('products', productData)) as any
