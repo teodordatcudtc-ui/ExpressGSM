@@ -127,7 +127,7 @@ export default function HomeProductsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-8"
+          className="mb-8 text-center"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
             Produse <span className="text-primary-600">recomandate</span>
@@ -136,8 +136,8 @@ export default function HomeProductsSection() {
             Telefoane, tablete și accesorii la prețuri avantajoase
           </p>
 
-          {/* Ordonează & Filtrează */}
-          <div className="flex flex-wrap items-center gap-3 mb-6">
+          {/* Ordonează & Filtrează - centrate */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
             <div className="relative">
               <button
                 type="button"
@@ -243,8 +243,8 @@ export default function HomeProductsSection() {
                       {product.name}
                     </h3>
                   </Link>
-                  <div className="mt-auto pt-3 flex items-center justify-between gap-2">
-                    <span className="font-bold text-primary-600">
+                  <div className="mt-auto pt-3 flex items-end justify-between gap-2 min-h-[44px]">
+                    <span className="font-bold text-primary-600 text-sm md:text-base">
                       {product.discount && product.discount > 0
                         ? ((product.price * (100 - product.discount)) / 100).toFixed(2)
                         : product.price.toFixed(2)}{' '}
@@ -253,10 +253,10 @@ export default function HomeProductsSection() {
                     <button
                       type="button"
                       onClick={(e) => handleAddToCart(product, e)}
-                      className="flex items-center justify-center gap-1 px-3 py-1.5 bg-primary-600 text-white rounded-lg text-sm font-semibold hover:bg-primary-700"
+                      className="flex-shrink-0 w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 text-xl font-light leading-none"
+                      aria-label="Adaugă în coș"
                     >
-                      <FiPlus className="w-4 h-4" />
-                      Adaugă
+                      +
                     </button>
                   </div>
                 </div>
