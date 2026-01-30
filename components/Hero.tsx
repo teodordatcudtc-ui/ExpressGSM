@@ -10,7 +10,7 @@ export default function Hero() {
   const [isHovered, setIsHovered] = useState(false)
 
   return (
-    <section className="relative py-12 md:py-12 lg:py-16 flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary-50 via-primary-100/50 to-white md:bg-gradient-to-b md:from-primary-50 md:via-primary-100/50 md:to-white">
+    <section className="relative py-8 md:py-12 lg:py-16 flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary-50 via-primary-100/50 to-white md:bg-gradient-to-b md:from-primary-50 md:via-primary-100/50 md:to-white">
       {/* Mobile: Simple gradient from blue to white */}
       <div className="absolute inset-0 overflow-hidden z-0 md:hidden bg-gradient-to-b from-primary-100 via-primary-50 to-white" />
       
@@ -208,12 +208,12 @@ export default function Hero() {
               </h2>
             </motion.div>
 
-            {/* Tag */}
+            {/* Tag - ascuns pe telefon */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-primary-200/80 backdrop-blur-sm text-primary-800 px-4 py-2 rounded-full text-sm font-semibold border border-primary-300/50 shadow-sm"
+              className="hidden md:inline-flex items-center gap-2 bg-primary-200/80 backdrop-blur-sm text-primary-800 px-4 py-2 rounded-full text-sm font-semibold border border-primary-300/50 shadow-sm"
             >
               <FiStar className="w-4 h-4" />
               <span>Tehnologie premium la prețuri accesibile</span>
