@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -23,7 +23,7 @@ interface CheckoutForm {
 
 const CHECKOUT_DATA_KEY = 'checkout_plata_data'
 
-export default function CheckoutPage() {
+function CheckoutPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { items, getTotal, clearCart, removeItem } = useCartStore()
@@ -502,3 +502,16 @@ export default function CheckoutPage() {
   )
 }
 
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="section-padding bg-gray-50 min-h-screen flex items-center justify-center">
+          <p className="text-gray-600">Se încarcă...</p>
+        </div>
+      }
+    >
+      <CheckoutPageContent />
+    </Suspense>
+  )
+}
