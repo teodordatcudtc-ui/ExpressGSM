@@ -109,6 +109,8 @@ export async function POST(request: Request) {
         hour: '2-digit',
         minute: '2-digit',
       }),
+      deliveryMethod: delivery,
+      paymentMethod: payment,
     }
 
     // Notificare către proprietar (ecranul@yahoo.com) – mereu

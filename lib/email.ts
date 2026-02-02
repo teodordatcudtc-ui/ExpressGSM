@@ -20,6 +20,21 @@ export interface OrderEmailData {
   }>
   totalAmount: number
   orderDate: string
+  /** Metodă livrare: ridicare_personala | curier_rapid */
+  deliveryMethod?: string
+  /** Metodă plată: ramburs | card_online */
+  paymentMethod?: string
+}
+
+function deliveryMethodLabel(value?: string): string {
+  if (value === 'ridicare_personala') return 'Ridicare personală din depozit (Pajurei 7, București – gratuit)'
+  if (value === 'curier_rapid') return 'Curier rapid – Livrare la adresă (28,00 lei)'
+  return value || '—'
+}
+function paymentMethodLabel(value?: string): string {
+  if (value === 'ramburs') return 'La ramburs'
+  if (value === 'card_online') return 'Plată cu cardul online'
+  return value || '—'
 }
 
 // Create SMTP transporter
@@ -103,6 +118,14 @@ function generateOrderEmailHTML(data: OrderEmailData): string {
                   <tr>
                     <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Adresă:</td>
                     <td style="padding: 8px 0; color: #1f2937; font-size: 14px; text-align: right;">${data.customerAddress}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Metodă livrare:</td>
+                    <td style="padding: 8px 0; color: #1f2937; font-size: 14px; text-align: right;">${deliveryMethodLabel(data.deliveryMethod)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Metodă plată:</td>
+                    <td style="padding: 8px 0; color: #1f2937; font-size: 14px; text-align: right;">${paymentMethodLabel(data.paymentMethod)}</td>
                   </tr>
                 </table>
               </div>
@@ -188,6 +211,8 @@ Client: ${data.customerName}
 Email: ${data.customerEmail || '—'}
 Telefon: ${data.customerPhone}
 Adresă: ${data.customerAddress}
+Metodă livrare: ${deliveryMethodLabel(data.deliveryMethod)}
+Metodă plată: ${paymentMethodLabel(data.paymentMethod)}
 
 Produse:
 ${data.items.map(item => `- ${item.product_name} x${item.quantity} = ${(item.price * item.quantity).toFixed(2)} RON`).join('\n')}
@@ -238,6 +263,8 @@ Detalii Comandă:
 - Data: ${data.orderDate}
 - Telefon: ${data.customerPhone}
 - Adresă: ${data.customerAddress}
+- Metodă livrare: ${deliveryMethodLabel(data.deliveryMethod)}
+- Metodă plată: ${paymentMethodLabel(data.paymentMethod)}
 
 Produse comandate:
 ${data.items.map(item => `- ${item.product_name} x${item.quantity} = ${(item.price * item.quantity).toFixed(2)} RON`).join('\n')}
