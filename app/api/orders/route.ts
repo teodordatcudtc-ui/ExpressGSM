@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
-import { sendOrderConfirmationEmail } from '@/lib/email'
+import { sendOrderConfirmationEmail, sendOrderNotificationToOwner } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,9 +45,10 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { customer_name, customer_email, customer_phone, customer_address, items, total_amount, user_id, delivery_method, payment_method } = body
 
-    if (!customer_name || !customer_email || !customer_phone || !customer_address || !items || items.length === 0) {
+    if (!customer_name || !customer_phone || !customer_address || !items || items.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
+    const customerEmail = (customer_email && String(customer_email).trim()) || ''
 
     const delivery = delivery_method === 'ridicare_personala' ? 'ridicare_personala' : 'curier_rapid'
     const payment = payment_method === 'card_online' ? 'card_online' : 'ramburs'
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
     const orderData: Record<string, unknown> = {
       order_number: orderNumber,
       customer_name,
-      customer_email,
+      customer_email: customerEmail || null,
       customer_phone,
       customer_address,
       total_amount: parseFloat(total_amount),
@@ -89,11 +90,10 @@ export async function POST(request: Request) {
     // Get order items
     const orderItems = (await db.getWhere('order_items', { order_id: order.id })) as any[]
 
-    // Send confirmation email (don't wait for it, send in background)
-    sendOrderConfirmationEmail({
+    const emailPayload = {
       orderNumber: order.order_number,
       customerName: customer_name,
-      customerEmail: customer_email,
+      customerEmail: customerEmail,
       customerPhone: customer_phone,
       customerAddress: customer_address,
       items: orderItems.map((item: any) => ({
@@ -109,8 +109,14 @@ export async function POST(request: Request) {
         hour: '2-digit',
         minute: '2-digit',
       }),
-    }).catch((error) => {
-      // Log error but don't fail the order
+    }
+
+    // Notificare către proprietar (ecranul@yahoo.com) – mereu
+    sendOrderNotificationToOwner(emailPayload).catch((error) => {
+      console.error('Failed to send owner notification:', error)
+    })
+    // Confirmare către client – doar dacă a dat email
+    sendOrderConfirmationEmail(emailPayload).catch((error) => {
       console.error('Failed to send confirmation email:', error)
     })
 

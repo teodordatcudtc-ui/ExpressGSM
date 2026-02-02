@@ -811,7 +811,7 @@ function AdminDashboardContent() {
                         #{order.order_number}
                       </p>
                       <p className="font-semibold text-gray-900">{order.customer_name}</p>
-                      <p className="text-sm text-gray-500">{order.customer_email}</p>
+                      <p className="text-sm text-gray-500">{order.customer_email || '—'}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-primary-600 text-lg mb-2">
@@ -872,7 +872,7 @@ function AdminDashboardContent() {
                         <td className="px-6 py-4 font-mono text-sm">{order.order_number}</td>
                         <td className="px-6 py-4">
                           <p className="font-semibold text-gray-900">{order.customer_name}</p>
-                          <p className="text-sm text-gray-500">{order.customer_email}</p>
+                          <p className="text-sm text-gray-500">{order.customer_email || '—'}</p>
                         </td>
                         <td className="px-6 py-4 font-bold text-primary-600">{order.total_amount.toFixed(2)} RON</td>
                         <td className="px-6 py-4">

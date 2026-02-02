@@ -25,7 +25,8 @@ Gmail oferă SMTP gratuit, perfect pentru început.
    SMTP_PORT=587
    SMTP_USER=your-email@gmail.com
    SMTP_PASS=your-16-char-app-password
-   SMTP_FROM=noreply@ecranul.ro
+   SMTP_FROM=contact@ecranul.ro
+   OWNER_EMAIL=ecranul@yahoo.com
    ```
 
    **Vercel (Environment Variables):**
@@ -35,7 +36,8 @@ Gmail oferă SMTP gratuit, perfect pentru început.
      - `SMTP_PORT` = `587`
      - `SMTP_USER` = email-ul tău Gmail
      - `SMTP_PASS` = parola de aplicație generată (16 caractere)
-     - `SMTP_FROM` = `noreply@ecranul.ro` sau email-ul tău Gmail
+     - `SMTP_FROM` = `contact@ecranul.ro` (sau email-ul tău Gmail dacă nu ai domeniu)
+     - `OWNER_EMAIL` = `ecranul@yahoo.com` (unde primești notificări la comenzi noi)
 
 3. **Redeploy aplicația pe Vercel**
 
@@ -49,15 +51,71 @@ Gmail oferă SMTP gratuit, perfect pentru început.
    SMTP_PORT=587
    SMTP_USER=your-email@outlook.com
    SMTP_PASS=your-password
-   SMTP_FROM=noreply@ecranul.ro
+   SMTP_FROM=contact@ecranul.ro
+   OWNER_EMAIL=ecranul@yahoo.com
    ```
 
    **Vercel:**
    - Adaugă aceleași variabile în Environment Variables
 
-## Opțiunea 3: SMTP Personal (Hosting, cPanel, etc.)
+## Opțiunea 3: Email de la domeniu (contact@ecranul.ro) – cPanel
 
-Dacă ai hosting cu cPanel sau alt serviciu SMTP:
+Dacă ai hosting cu **cPanel** și vrei să trimiți emailuri de la **contact@ecranul.ro**:
+
+### 1. Creează adresa contact@ecranul.ro în cPanel
+
+1. Intră în **cPanel** (de la providerul de hosting).
+2. Caută secțiunea **Email** → **Email Accounts**.
+3. Click pe **Create** / **Creează**.
+4. La **Email**: scrie `contact` (domeniul ecranul.ro e deja ales).
+5. Setează o **parolă** puternică pentru acest cont și salvează-o undeva sigur.
+6. Finalizează crearea contului.
+
+### 2. Conectează site-ul la acest email (SMTP)
+
+Aplicația trimite emailuri prin SMTP. Trebuie să folosești exact contul **contact@ecranul.ro** și parola lui.
+
+**Unde vezi SMTP_HOST și SMTP_PORT:**
+
+1. În **Email Accounts**, apasă **„Connect Devices”** lângă **contact@ecranul.ro**.
+2. Pe pagina care se deschide sunt setările pentru clientul de email:
+   - **Outgoing Server** / **Server pentru trimitere** = **SMTP_HOST** (ex: `mail.ecranul.ro` sau `ecranul.ro`)
+   - **Port** pentru SMTP = **SMTP_PORT** (de obicei **587** cu TLS sau **465** cu SSL)
+
+**Setări tipice pentru cPanel:**
+
+- **SMTP_HOST**: de obicei `mail.ecranul.ro` sau `ecranul.ro` (exact cum apare la „Outgoing Server” în Connect Devices).
+- **SMTP_PORT**: `587` (TLS) sau `465` (SSL) – vezi în aceeași pagină ce port e indicat pentru SMTP.
+- **Utilizator**: `contact@ecranul.ro`
+- **Parolă**: parola pe care ai setat-o la pasul 1.
+
+**Variabile de mediu (.env.local și Vercel):**
+
+```bash
+SMTP_HOST=mail.ecranul.ro
+SMTP_PORT=587
+SMTP_USER=contact@ecranul.ro
+SMTP_PASS=parola_contului_contact
+SMTP_FROM=contact@ecranul.ro
+```
+
+După ce le pui, **redeploy** pe Vercel ca să se aplice. De atunci, toate emailurile (confirmări comenzi, notificări) vor apărea trimise de la **contact@ecranul.ro**.
+
+### 3. Unde primești notificările la comenzi noi
+
+La fiecare comandă nouă, **proprietarul** primește un email la adresa **ecranul@yahoo.com** (notificare „Comandă nouă”). Această adresă e setată în cod; o poți schimba cu variabila de mediu:
+
+```bash
+OWNER_EMAIL=ecranul@yahoo.com
+```
+
+Dacă vrei notificările pe alt email, pune acolo adresa dorită (ex: `contact@ecranul.ro`).
+
+---
+
+## Opțiunea 4: SMTP generic (alt hosting / provider)
+
+Dacă ai alt serviciu SMTP (nu neapărat cPanel):
 
 1. **Obține setările SMTP de la provider**
    - De obicei: `smtp.yourdomain.com` sau `mail.yourdomain.com`
@@ -68,9 +126,10 @@ Dacă ai hosting cu cPanel sau alt serviciu SMTP:
    ```bash
    SMTP_HOST=smtp.yourdomain.com
    SMTP_PORT=587
-   SMTP_USER=noreply@yourdomain.com
+   SMTP_USER=contact@ecranul.ro
    SMTP_PASS=your-email-password
-   SMTP_FROM=noreply@yourdomain.com
+   SMTP_FROM=contact@ecranul.ro
+   OWNER_EMAIL=ecranul@yahoo.com
    ```
 
 ## Testare

@@ -261,19 +261,18 @@ function CheckoutPageContent() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                     <FiMail className="w-4 h-4" />
-                    Email *
+                    Email (opțional)
                   </label>
                   <input
                     {...register('customer_email', {
-                      required: 'Email-ul este obligatoriu',
                       pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        value: /^$|^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                         message: 'Email invalid',
                       },
                     })}
                     type="email"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                    placeholder="ion.popescu@example.com"
+                    placeholder="ion.popescu@example.com (lăsați gol dacă nu aveți)"
                   />
                   {errors.customer_email && (
                     <p className="text-red-600 text-sm mt-1">{errors.customer_email.message}</p>

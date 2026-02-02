@@ -1,6 +1,12 @@
 // Email Service - SMTP with Nodemailer
 import nodemailer from 'nodemailer'
 
+/** Email unde primești notificări la comenzi noi (proprietar) */
+const OWNER_EMAIL = process.env.OWNER_EMAIL || 'ecranul@yahoo.com'
+
+/** Adresa de la care se trimit emailurile afacerii (domeniu) */
+const BUSINESS_FROM = process.env.SMTP_FROM || 'contact@ecranul.ro'
+
 export interface OrderEmailData {
   orderNumber: string
   customerName: string
@@ -160,8 +166,48 @@ function generateOrderEmailHTML(data: OrderEmailData): string {
   `
 }
 
-// Send order confirmation email via SMTP
+// Trimite notificare către proprietar (ecranul@yahoo.com) când vine o comandă nouă
+export async function sendOrderNotificationToOwner(data: OrderEmailData): Promise<void> {
+  const transporter = createTransporter()
+  if (!transporter) {
+    console.log('📧 Notificare owner would be sent (SMTP not configured):', { to: OWNER_EMAIL, orderNumber: data.orderNumber })
+    return
+  }
+  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || BUSINESS_FROM
+  try {
+    await transporter.sendMail({
+      from: `"ecranul.ro" <${fromEmail}>`,
+      to: OWNER_EMAIL,
+      subject: `🛒 Comandă nouă ${data.orderNumber} - ecranul.ro`,
+      html: generateOrderEmailHTML(data),
+      text: `
+Comandă nouă - ecranul.ro
+
+Număr: ${data.orderNumber}
+Client: ${data.customerName}
+Email: ${data.customerEmail || '—'}
+Telefon: ${data.customerPhone}
+Adresă: ${data.customerAddress}
+
+Produse:
+${data.items.map(item => `- ${item.product_name} x${item.quantity} = ${(item.price * item.quantity).toFixed(2)} RON`).join('\n')}
+
+Total: ${data.totalAmount.toFixed(2)} RON
+Data: ${data.orderDate}
+      `.trim(),
+    })
+    console.log(`✅ Notificare comandă trimisă către ${OWNER_EMAIL}`)
+  } catch (error: any) {
+    console.error('❌ Eroare trimitere notificare owner:', error)
+    throw error
+  }
+}
+
+// Send order confirmation email via SMTP (doar către client, dacă a furnizat email)
 export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<void> {
+  if (!data.customerEmail || !data.customerEmail.trim()) {
+    return // client fără email – nu trimitem confirmare
+  }
   const transporter = createTransporter()
 
   if (!transporter) {
@@ -172,7 +218,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
     return
   }
 
-  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@ecranul.ro'
+  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || BUSINESS_FROM
 
   try {
     const info = await transporter.sendMail({

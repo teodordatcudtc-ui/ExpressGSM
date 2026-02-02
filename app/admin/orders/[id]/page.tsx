@@ -143,7 +143,7 @@ export default function OrderDetailPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Email</p>
-                <p className="font-semibold break-words">{order.customer_email}</p>
+                <p className="font-semibold break-words">{order.customer_email || '—'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Telefon</p>
