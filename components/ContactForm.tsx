@@ -65,10 +65,21 @@ export default function ContactForm() {
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
                 Informații de Contact
               </h2>
-              <p className="text-gray-600 mb-8">
+              <p className="text-gray-600 mb-6">
                 Ne poți contacta pe WhatsApp sau poți veni direct la magazinul nostru. 
                 Programul nostru este flexibil și suntem gata să te ajutăm.
               </p>
+              {/* Date companie (obligatorii pentru ANPC / Netopia) */}
+              <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Date firmă</h3>
+                <ul className="space-y-1 text-gray-700 text-sm">
+                  <li><strong>Denumire:</strong> ecranul.ro</li>
+                  <li><strong>CUI:</strong> 516219916</li>
+                  <li><strong>Adresă:</strong> Strada Pajurei 7, Sector 1, București, 011318</li>
+                  <li><strong>Telefon:</strong> <a href="tel:0799665665" className="text-primary-600 hover:text-primary-700">0799665665</a></li>
+                  <li><strong>Email:</strong> <a href="mailto:contact@ecranul.ro" className="text-primary-600 hover:text-primary-700">contact@ecranul.ro</a></li>
+                </ul>
+              </div>
             </div>
 
             <div className="space-y-6">

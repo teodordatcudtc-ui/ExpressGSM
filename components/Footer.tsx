@@ -2,7 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { FiPhone, FiMapPin, FiMail, FiFacebook, FiInstagram, FiClock, FiLock } from 'react-icons/fi'
+
+const NTPIdentity = dynamic(() => import('ntp-logo-react').then((m) => m.default), { ssr: false })
 
 export default function Footer() {
   return (
@@ -55,25 +58,31 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact Info + Company data (ANPC/Netopia) */}
           <div>
             <h4 className="text-white font-semibold mb-4">Contact</h4>
             <ul className="space-y-3">
               <li className="flex items-start space-x-3">
-                <FiPhone className="w-5 h-5 mt-1 text-primary-400" />
+                <FiPhone className="w-5 h-5 mt-1 text-primary-400 shrink-0" />
                 <a href="tel:0799665665" className="hover:text-primary-400 transition-colors">
                   0799665665
                 </a>
               </li>
               <li className="flex items-start space-x-3">
-                <FiMapPin className="w-5 h-5 mt-1 text-primary-400" />
+                <FiMail className="w-5 h-5 mt-1 text-primary-400 shrink-0" />
+                <a href="mailto:contact@ecranul.ro" className="hover:text-primary-400 transition-colors">
+                  contact@ecranul.ro
+                </a>
+              </li>
+              <li className="flex items-start space-x-3">
+                <FiMapPin className="w-5 h-5 mt-1 text-primary-400 shrink-0" />
                 <span>
-                  Strada Pajurei 7<br />
-                  București
+                  Strada Pajurei 7, Sector 1<br />
+                  București, 011318
                 </span>
               </li>
               <li className="flex items-start space-x-3">
-                <FiClock className="w-5 h-5 mt-1 text-primary-400" />
+                <FiClock className="w-5 h-5 mt-1 text-primary-400 shrink-0" />
                 <span>
                   Luni - Vineri: 09:00 - 19:00<br />
                   Sâmbătă: 09:00 - 17:00
@@ -104,59 +113,78 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Legal Links and Badges */}
+        {/* Legal Links and Badges (ANPC SAL + SOL + Netopia) */}
         <div className="border-t border-gray-800 mt-8 pt-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
-            {/* Legal Links - Left */}
-            <div className="flex flex-wrap justify-center sm:justify-start gap-4">
-              <Link href="/politica-cookie" className="text-gray-400 hover:text-primary-400 transition-colors text-sm">
-                Politica de Utilizare Cookie-uri
+          <div className="flex flex-col gap-4 mb-4">
+            {/* Legal Links */}
+            <div className="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1 text-sm">
+              <Link href="/termeni-conditii" className="text-gray-400 hover:text-primary-400 transition-colors">
+                Termeni și Condiții
               </Link>
               <span className="text-gray-600 hidden sm:inline">|</span>
-              <Link href="/termeni-conditii" className="text-gray-400 hover:text-primary-400 transition-colors text-sm">
-                Termeni și Condiții
+              <Link href="/politica-confidentialitate" className="text-gray-400 hover:text-primary-400 transition-colors">
+                Politica de confidențialitate
+              </Link>
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <Link href="/politica-cookie" className="text-gray-400 hover:text-primary-400 transition-colors">
+                Politica Cookie-uri
+              </Link>
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <Link href="/politica-livrare" className="text-gray-400 hover:text-primary-400 transition-colors">
+                Politica de livrare
+              </Link>
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <Link href="/politica-anulare" className="text-gray-400 hover:text-primary-400 transition-colors">
+                Politica de anulare
               </Link>
             </div>
 
-            {/* ANPC Badges - Right */}
+            {/* Măsurile ANPC (SAL) + SOL + Logo NETOPIA - Ordin 449/2022 */}
             <div className="flex flex-wrap justify-center sm:justify-end items-center gap-4">
               <a
-                href="https://anpc.ro/"
+                href="https://anpc.ro/ce-este-sal/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:opacity-80 transition-opacity inline-block"
-                title="Autoritatea Națională pentru Protecția Consumatorilor"
+                title="Măsurile ANPC de informare a consumatorilor - Soluționarea alternativă a litigiilor (SAL)"
               >
                 <Image
                   src="/anpc-badge.png"
-                  alt="ANPC - Autoritatea Națională pentru Protecția Consumatorilor"
-                  width={80}
-                  height={40}
-                  className="h-10 w-auto object-contain"
+                  alt="ANPC - Soluționarea alternativă a litigiilor (SAL)"
+                  width={250}
+                  height={50}
+                  className="h-[50px] w-auto object-contain max-w-[250px]"
                   onError={(e) => {
-                    // Fallback dacă imaginea nu există
                     e.currentTarget.style.display = 'none'
                   }}
                 />
               </a>
               <a
-                href="https://ec.europa.eu/consumers/odr/main/index.cfm?event=main.home2.show&lng=RO"
+                href="https://ec.europa.eu/consumers/odr"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:opacity-80 transition-opacity inline-block"
-                title="Platforma Online de Soluționare Alternativă a Litigiilor"
+                title="Platforma SOL - Soluționare Online Litigii"
               >
                 <Image
                   src="/sol-badge.png"
                   alt="SOL - Platforma Online de Soluționare Alternativă a Litigiilor"
-                  width={80}
-                  height={40}
-                  className="h-10 w-auto object-contain"
+                  width={250}
+                  height={50}
+                  className="h-[50px] w-auto object-contain max-w-[250px]"
                   onError={(e) => {
-                    // Fallback dacă imaginea nu există
                     e.currentTarget.style.display = 'none'
                   }}
                 />
+              </a>
+              <a
+                href="https://www.netopia.ro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block [&_svg]:max-h-10 [&_svg]:w-auto"
+                title="Plată securizată cu NETOPIA Payments"
+              >
+                <NTPIdentity color="#9ca3af" version="horizontal" secret="160327" />
               </a>
             </div>
           </div>
