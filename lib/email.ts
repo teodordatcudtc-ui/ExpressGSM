@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer'
 const OWNER_EMAIL = process.env.OWNER_EMAIL || 'ecranul@yahoo.com'
 
 /** Adresa de la care se trimit emailurile afacerii (domeniu) */
-const BUSINESS_FROM = process.env.SMTP_FROM || 'contact@ecranul.ro'
+const BUSINESS_FROM = process.env.SMTP_FROM || 'ecranul@yahoo.com'
 
 export interface OrderEmailData {
   orderNumber: string
@@ -179,7 +179,7 @@ function generateOrderEmailHTML(data: OrderEmailData, options?: { forOwner?: boo
               </div>
               
               <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 30px 0 0 0;">
-                Dacă ai întrebări despre comanda ta, te rugăm să ne contactezi la <a href="mailto:contact@ecranul.ro" style="color: #667eea; text-decoration: none;">contact@ecranul.ro</a> sau telefonic.
+                Dacă ai întrebări despre comanda ta, te rugăm să ne contactezi la <a href="mailto:ecranul@yahoo.com" style="color: #667eea; text-decoration: none;">ecranul@yahoo.com</a> sau telefonic.
               </p>
             </td>
           </tr>
@@ -294,7 +294,7 @@ ${(data.paymentStatus === 'platita' || data.paymentStatus === 'paid')
     ? 'Plata cu cardul va fi confirmată după finalizarea tranzacției. Vei fi contactat în curând.'
     : 'Notă: Plata se va efectua la livrare (ramburs). Vei fi contactat în curând pentru confirmarea comenzii și detalii despre livrare.'}
 
-Dacă ai întrebări, te rugăm să ne contactezi la contact@ecranul.ro
+Dacă ai întrebări, te rugăm să ne contactezi la ecranul@yahoo.com
 
 ecranul.ro
 București, Strada Pajurei 7

@@ -112,8 +112,8 @@ export default function CookiePolicyPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Contact</h2>
             <p className="text-gray-700 leading-relaxed">
               Dacă aveți întrebări despre utilizarea cookie-urilor pe site-ul nostru, vă rugăm să ne contactați la:{' '}
-              <a href="mailto:contact@ecranul.ro" className="text-primary-600 hover:text-primary-700 font-semibold">
-                contact@ecranul.ro
+              <a href="mailto:ecranul@yahoo.com" className="text-primary-600 hover:text-primary-700 font-semibold">
+                ecranul@yahoo.com
               </a>
             </p>
           </section>

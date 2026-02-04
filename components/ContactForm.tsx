@@ -77,7 +77,7 @@ export default function ContactForm() {
                   <li><strong>CUI:</strong> 516219916</li>
                   <li><strong>Adresă:</strong> Strada Pajurei 7, Sector 1, București, 011318</li>
                   <li><strong>Telefon:</strong> <a href="tel:0799665665" className="text-primary-600 hover:text-primary-700">0799665665</a></li>
-                  <li><strong>Email:</strong> <a href="mailto:contact@ecranul.ro" className="text-primary-600 hover:text-primary-700">contact@ecranul.ro</a></li>
+                  <li><strong>Email:</strong> <a href="mailto:ecranul@yahoo.com" className="text-primary-600 hover:text-primary-700">ecranul@yahoo.com</a></li>
                 </ul>
               </div>
             </div>

@@ -70,8 +70,8 @@ export default function Footer() {
               </li>
               <li className="flex items-start space-x-3">
                 <FiMail className="w-5 h-5 mt-1 text-primary-400 shrink-0" />
-                <a href="mailto:contact@ecranul.ro" className="hover:text-primary-400 transition-colors">
-                  contact@ecranul.ro
+                <a href="mailto:ecranul@yahoo.com" className="hover:text-primary-400 transition-colors">
+                  ecranul@yahoo.com
                 </a>
               </li>
               <li className="flex items-start space-x-3">

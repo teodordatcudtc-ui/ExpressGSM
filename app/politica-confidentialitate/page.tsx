@@ -51,7 +51,7 @@ export default function PoliticaConfidentialitatePage() {
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Drepturile dvs. (GDPR)</h2>
-            <p className="text-gray-700 leading-relaxed mb-3">Aveți dreptul la: acces la date, rectificare, ștergere („dreptul de a fi uitat”), restricționarea prelucrării, portabilitatea datelor, opoziție și dreptul de a depune plângere la ANSPDCP (Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal). Pentru exercitarea drepturilor, contactați-ne la <a href="mailto:contact@ecranul.ro" className="text-primary-600 hover:text-primary-700 font-semibold">contact@ecranul.ro</a>.</p>
+            <p className="text-gray-700 leading-relaxed mb-3">Aveți dreptul la: acces la date, rectificare, ștergere („dreptul de a fi uitat”), restricționarea prelucrării, portabilitatea datelor, opoziție și dreptul de a depune plângere la ANSPDCP (Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal). Pentru exercitarea drepturilor, contactați-ne la <a href="mailto:ecranul@yahoo.com" className="text-primary-600 hover:text-primary-700 font-semibold">ecranul@yahoo.com</a>.</p>
           </section>
 
           <section>
@@ -62,7 +62,7 @@ export default function PoliticaConfidentialitatePage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Contact</h2>
             <p className="text-gray-700 leading-relaxed">
-              Pentru întrebări despre confidențialitate și protecția datelor: <a href="mailto:contact@ecranul.ro" className="text-primary-600 hover:text-primary-700 font-semibold">contact@ecranul.ro</a>. Pentru politica de cookie-uri, consultați <Link href="/politica-cookie" className="text-primary-600 hover:text-primary-700 font-semibold">Politica de Utilizare Cookie-uri</Link>.
+              Pentru întrebări despre confidențialitate și protecția datelor: <a href="mailto:ecranul@yahoo.com" className="text-primary-600 hover:text-primary-700 font-semibold">ecranul@yahoo.com</a>. Pentru politica de cookie-uri, consultați <Link href="/politica-cookie" className="text-primary-600 hover:text-primary-700 font-semibold">Politica de Utilizare Cookie-uri</Link>.
             </p>
           </section>
         </motion.div>

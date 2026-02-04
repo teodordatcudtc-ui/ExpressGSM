@@ -24,7 +24,7 @@ export default function PoliticaAnularePage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded-xl shadow-lg p-8 space-y-6">
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Anularea comenzii înainte de expediere</h2>
-            <p className="text-gray-700 leading-relaxed">Puteți solicita anularea unei comenzi înainte ca aceasta să fie predată curierului sau pregătită pentru ridicare. Contactați-ne cât mai curând la <a href="mailto:contact@ecranul.ro" className="text-primary-600 hover:text-primary-700 font-semibold">contact@ecranul.ro</a> sau la telefon <a href="tel:0799665665" className="text-primary-600 hover:text-primary-700 font-semibold">0799665665</a>, indicând numărul comenzii. Dacă comanda nu a fost deja expediată, o anulăm și vi se rambursează suma plătită (inclusiv prin card, conform politicii procesatorului de plăți), în termenul stabilit de lege (de obicei în 14 zile).</p>
+            <p className="text-gray-700 leading-relaxed">Puteți solicita anularea unei comenzi înainte ca aceasta să fie predată curierului sau pregătită pentru ridicare. Contactați-ne cât mai curând la <a href="mailto:ecranul@yahoo.com" className="text-primary-600 hover:text-primary-700 font-semibold">ecranul@yahoo.com</a> sau la telefon <a href="tel:0799665665" className="text-primary-600 hover:text-primary-700 font-semibold">0799665665</a>, indicând numărul comenzii. Dacă comanda nu a fost deja expediată, o anulăm și vi se rambursează suma plătită (inclusiv prin card, conform politicii procesatorului de plăți), în termenul stabilit de lege (de obicei în 14 zile).</p>
           </section>
 
           <section>
@@ -46,7 +46,7 @@ export default function PoliticaAnularePage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Contact</h2>
             <p className="text-gray-700 leading-relaxed">
-              Pentru orice cerere de anulare sau retur: <a href="mailto:contact@ecranul.ro" className="text-primary-600 hover:text-primary-700 font-semibold">contact@ecranul.ro</a>, <a href="tel:0799665665" className="text-primary-600 hover:text-primary-700 font-semibold">0799665665</a>. Menționați întotdeauna numărul comenzii. Pentru litigii, consultați <Link href="/termeni-conditii" className="text-primary-600 hover:text-primary-700 font-semibold">Termenii și Condițiile</Link> și măsurile ANPC (SAL) / Platforma SOL, linkurile fiind disponibile în footer-ul site-ului.
+              Pentru orice cerere de anulare sau retur: <a href="mailto:ecranul@yahoo.com" className="text-primary-600 hover:text-primary-700 font-semibold">ecranul@yahoo.com</a>, <a href="tel:0799665665" className="text-primary-600 hover:text-primary-700 font-semibold">0799665665</a>. Menționați întotdeauna numărul comenzii. Pentru litigii, consultați <Link href="/termeni-conditii" className="text-primary-600 hover:text-primary-700 font-semibold">Termenii și Condițiile</Link> și măsurile ANPC (SAL) / Platforma SOL, linkurile fiind disponibile în footer-ul site-ului.
             </p>
           </section>
         </motion.div>

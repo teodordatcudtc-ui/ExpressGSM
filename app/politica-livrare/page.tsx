@@ -53,7 +53,7 @@ export default function PoliticaLivrarePage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Contact</h2>
             <p className="text-gray-700 leading-relaxed">
-              Pentru întrebări despre livrare: <a href="mailto:contact@ecranul.ro" className="text-primary-600 hover:text-primary-700 font-semibold">contact@ecranul.ro</a> sau telefon <a href="tel:0799665665" className="text-primary-600 hover:text-primary-700 font-semibold">0799665665</a>. Consultați și <Link href="/termeni-conditii" className="text-primary-600 hover:text-primary-700 font-semibold">Termenii și Condițiile</Link>.
+              Pentru întrebări despre livrare: <a href="mailto:ecranul@yahoo.com" className="text-primary-600 hover:text-primary-700 font-semibold">ecranul@yahoo.com</a> sau telefon <a href="tel:0799665665" className="text-primary-600 hover:text-primary-700 font-semibold">0799665665</a>. Consultați și <Link href="/termeni-conditii" className="text-primary-600 hover:text-primary-700 font-semibold">Termenii și Condițiile</Link>.
             </p>
           </section>
         </motion.div>

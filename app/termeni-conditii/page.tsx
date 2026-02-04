@@ -147,7 +147,7 @@ export default function TermsConditionsPage() {
             </p>
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-gray-700">
-                <strong>Email:</strong> <a href="mailto:contact@ecranul.ro" className="text-primary-600 hover:text-primary-700">contact@ecranul.ro</a>
+                <strong>Email:</strong> <a href="mailto:ecranul@yahoo.com" className="text-primary-600 hover:text-primary-700">ecranul@yahoo.com</a>
               </p>
               <p className="text-gray-700">
                 <strong>Telefon:</strong> <a href="tel:0799665665" className="text-primary-600 hover:text-primary-700">0799665665</a>
