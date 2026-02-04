@@ -57,7 +57,7 @@ export default function CheckoutPlataPage() {
     if (!data) return
     setIsProcessing(true)
     try {
-      const response = await fetch('/api/orders', {
+      const orderRes = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -77,14 +77,44 @@ export default function CheckoutPlataPage() {
           total_amount: data.total,
         }),
       })
-      if (!response.ok) throw new Error('Failed to create order')
-      const order = await response.json()
+      if (!orderRes.ok) throw new Error('Failed to create order')
+      const order = await orderRes.json()
+
+      if (paymentMethod === 'card_online') {
+        const netopiaRes = await fetch('/api/netopia/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: order.id }),
+        })
+        if (!netopiaRes.ok) {
+          const err = await netopiaRes.json().catch(() => ({}))
+          throw new Error(err?.error || 'Netopia payment could not be started')
+        }
+        const { formAction, env_key, data: envData, iv, cipher } = await netopiaRes.json()
+        clearCart()
+        sessionStorage.removeItem(CHECKOUT_DATA_KEY)
+        const form = document.createElement('form')
+        form.method = 'POST'
+        form.action = formAction
+        form.style.display = 'none'
+        for (const [name, value] of Object.entries({ env_key, data: envData, iv, cipher })) {
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = name
+          input.value = value as string
+          form.appendChild(input)
+        }
+        document.body.appendChild(form)
+        form.submit()
+        return
+      }
+
       clearCart()
       sessionStorage.removeItem(CHECKOUT_DATA_KEY)
       router.replace(`/checkout?placed=${encodeURIComponent(order.order_number)}`)
     } catch (error) {
       console.error(error)
-      alert('A apărut o eroare. Te rugăm să încerci din nou.')
+      alert(error instanceof Error ? error.message : 'A apărut o eroare. Te rugăm să încerci din nou.')
     } finally {
       setIsProcessing(false)
     }
@@ -195,7 +225,7 @@ export default function CheckoutPlataPage() {
                   <FiCreditCard className="w-5 h-5 text-primary-600" />
                   Plată cu cardul online
                 </span>
-                <p className="text-sm text-gray-600 mt-0.5">Plată securizată cu cardul (în curând)</p>
+                <p className="text-sm text-gray-600 mt-0.5">Plată securizată cu cardul (Netopia)</p>
               </div>
             </label>
           </div>

@@ -829,7 +829,7 @@ function AdminDashboardContent() {
                       {order.status}
                     </span>
                     <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                      order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
+                      (order.payment_status === 'paid' || order.payment_status === 'platita') ? 'bg-green-100 text-green-800' :
                       'bg-red-100 text-red-800'
                     }`}>
                       {order.payment_status}
@@ -886,7 +886,7 @@ function AdminDashboardContent() {
                         </td>
                         <td className="px-6 py-4">
                           <span className={`px-2 py-1 rounded text-sm ${
-                            order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
+                            (order.payment_status === 'paid' || order.payment_status === 'platita') ? 'bg-green-100 text-green-800' :
                             'bg-red-100 text-red-800'
                           }`}>
                             {order.payment_status}

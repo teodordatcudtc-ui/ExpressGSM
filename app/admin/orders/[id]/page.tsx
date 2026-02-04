@@ -125,7 +125,7 @@ export default function OrderDetailPage() {
                 {order.status}
               </span>
               <span className={`px-3 py-1 rounded text-sm font-semibold ${
-                order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
+                (order.payment_status === 'paid' || order.payment_status === 'platita') ? 'bg-green-100 text-green-800' :
                 'bg-red-100 text-red-800'
               }`}>
                 {order.payment_status}
