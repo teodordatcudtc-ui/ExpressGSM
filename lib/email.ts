@@ -24,6 +24,8 @@ export interface OrderEmailData {
   deliveryMethod?: string
   /** Metodă plată: ramburs | card_online */
   paymentMethod?: string
+  /** Status plată: pending | platita | paid */
+  paymentStatus?: string
 }
 
 function deliveryMethodLabel(value?: string): string {
@@ -35,6 +37,11 @@ function paymentMethodLabel(value?: string): string {
   if (value === 'ramburs') return 'La ramburs'
   if (value === 'card_online') return 'Plată cu cardul online'
   return value || '—'
+}
+function paymentStatusLabel(value?: string): string {
+  if (value === 'platita' || value === 'paid') return 'Plătit'
+  if (value === 'pending') return 'În așteptare'
+  return value ? String(value) : '—'
 }
 
 // Create SMTP transporter
@@ -127,6 +134,10 @@ function generateOrderEmailHTML(data: OrderEmailData): string {
                     <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Metodă plată:</td>
                     <td style="padding: 8px 0; color: #1f2937; font-size: 14px; text-align: right;">${paymentMethodLabel(data.paymentMethod)}</td>
                   </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Status plată:</td>
+                    <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${paymentStatusLabel(data.paymentStatus)}</td>
+                  </tr>
                 </table>
               </div>
               
@@ -158,7 +169,11 @@ function generateOrderEmailHTML(data: OrderEmailData): string {
               <!-- Footer Message -->
               <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 30px 0; border-radius: 4px;">
                 <p style="color: #92400e; font-size: 14px; margin: 0; line-height: 1.6;">
-                  <strong>Notă:</strong> Plata se va efectua la livrare (ramburs). Vei fi contactat în curând pentru confirmarea comenzii și detalii despre livrare.
+                  ${(data.paymentStatus === 'platita' || data.paymentStatus === 'paid')
+    ? '<strong>Plata a fost confirmată.</strong> Vei fi contactat în curând pentru detalii despre livrare.'
+    : data.paymentMethod === 'card_online'
+      ? 'Plata cu cardul va fi confirmată după finalizarea tranzacției. Vei fi contactat în curând pentru detalii despre livrare.'
+      : '<strong>Notă:</strong> Plata se va efectua la livrare (ramburs). Vei fi contactat în curând pentru confirmarea comenzii și detalii despre livrare.'}
                 </p>
               </div>
               
@@ -213,6 +228,7 @@ Telefon: ${data.customerPhone}
 Adresă: ${data.customerAddress}
 Metodă livrare: ${deliveryMethodLabel(data.deliveryMethod)}
 Metodă plată: ${paymentMethodLabel(data.paymentMethod)}
+Status plată: ${paymentStatusLabel(data.paymentStatus)}
 
 Produse:
 ${data.items.map(item => `- ${item.product_name} x${item.quantity} = ${(item.price * item.quantity).toFixed(2)} RON`).join('\n')}
@@ -265,13 +281,18 @@ Detalii Comandă:
 - Adresă: ${data.customerAddress}
 - Metodă livrare: ${deliveryMethodLabel(data.deliveryMethod)}
 - Metodă plată: ${paymentMethodLabel(data.paymentMethod)}
+- Status plată: ${paymentStatusLabel(data.paymentStatus)}
 
 Produse comandate:
 ${data.items.map(item => `- ${item.product_name} x${item.quantity} = ${(item.price * item.quantity).toFixed(2)} RON`).join('\n')}
 
 Total: ${data.totalAmount.toFixed(2)} RON
 
-Notă: Plata se va efectua la livrare (ramburs). Vei fi contactat în curând pentru confirmarea comenzii și detalii despre livrare.
+${(data.paymentStatus === 'platita' || data.paymentStatus === 'paid')
+  ? 'Plata a fost confirmată. Vei fi contactat în curând pentru detalii despre livrare.'
+  : data.paymentMethod === 'card_online'
+    ? 'Plata cu cardul va fi confirmată după finalizarea tranzacției. Vei fi contactat în curând.'
+    : 'Notă: Plata se va efectua la livrare (ramburs). Vei fi contactat în curând pentru confirmarea comenzii și detalii despre livrare.'}
 
 Dacă ai întrebări, te rugăm să ne contactezi la contact@ecranul.ro
 
@@ -284,6 +305,49 @@ București, Strada Pajurei 7
     console.log(`📧 Message ID: ${info.messageId}`)
   } catch (error: any) {
     console.error('❌ Failed to send email via SMTP:', error)
+    throw error
+  }
+}
+
+/** Trimite scurt "Plata confirmată" către client (dacă are email) și către proprietar */
+export async function sendPaymentConfirmedEmails(params: {
+  orderNumber: string
+  customerName: string
+  customerEmail?: string | null
+}): Promise<void> {
+  const transporter = createTransporter()
+  if (!transporter) {
+    console.log('📧 Payment confirmed emails skipped (SMTP not configured)')
+    return
+  }
+  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || BUSINESS_FROM
+  const msg = `Plata pentru comanda ${params.orderNumber} a fost confirmată. Mulțumim!`
+  const html = `
+    <p>Bună ziua, ${params.customerName}!</p>
+    <p><strong>Plata pentru comanda ${params.orderNumber} a fost confirmată.</strong></p>
+    <p>Mulțumim! Vei fi contactat în curând pentru detalii despre livrare.</p>
+    <p>— ecranul.ro</p>
+  `
+  try {
+    await transporter.sendMail({
+      from: `"ecranul.ro" <${fromEmail}>`,
+      to: OWNER_EMAIL,
+      subject: `✅ Plată confirmată – Comandă ${params.orderNumber}`,
+      text: `[Proprietar] ${msg}`,
+      html: `<div style="font-family: sans-serif;">${html}</div>`,
+    })
+    if (params.customerEmail && params.customerEmail.trim()) {
+      await transporter.sendMail({
+        from: `"ecranul.ro" <${fromEmail}>`,
+        to: params.customerEmail.trim(),
+        subject: `Plata confirmată – Comandă ${params.orderNumber} - ecranul.ro`,
+        text: msg,
+        html: `<div style="font-family: sans-serif;">${html}</div>`,
+      })
+    }
+    console.log('✅ Payment confirmed emails sent')
+  } catch (error: any) {
+    console.error('❌ sendPaymentConfirmedEmails:', error)
     throw error
   }
 }

@@ -176,6 +176,10 @@ export async function parseIpnXml(decryptedXml: string): Promise<IpnParsed> {
       decryptedXml.match(/id=["']([^"']+)["']/i)
     if (idMatch) orderId = idMatch[1].trim()
   }
+  if (!orderId && /ORD-/.test(decryptedXml)) {
+    const ordMatch = decryptedXml.match(/(ORD-\d+-[A-Z0-9]+)/i)
+    if (ordMatch) orderId = ordMatch[1].trim()
+  }
   if (!action && decryptedXml.includes('action')) {
     const actionMatch = decryptedXml.match(/<action[^>]*>([^<]+)</i)
     if (actionMatch) action = actionMatch[1].trim().toLowerCase()

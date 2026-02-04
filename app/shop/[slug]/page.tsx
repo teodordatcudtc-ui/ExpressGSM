@@ -109,8 +109,11 @@ export default function ProductPage() {
     }, 500)
   }
 
+  const outOfStock = product != null && (product.stock == null || product.stock <= 0)
+
   const increaseQuantity = () => {
-    setQuantity(quantity + 1)
+    if (!product) return
+    if (product.stock == null || quantity < product.stock) setQuantity(quantity + 1)
   }
 
   const decreaseQuantity = () => {
@@ -321,51 +324,64 @@ export default function ProductPage() {
                 </div>
               )}
 
-              {/* Quantity Selector */}
-              <div className="mb-8">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Cantitate:
-                </label>
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={decreaseQuantity}
-                    disabled={quantity <= 1}
-                    className="w-12 h-12 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-primary-600 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <FiMinus className="w-5 h-5" />
-                  </button>
-                  <span className="text-2xl font-bold text-gray-900 w-16 text-center">{quantity}</span>
-                  <button
-                    onClick={increaseQuantity}
-                    className="w-12 h-12 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-primary-600 hover:bg-primary-50 transition-colors"
-                  >
-                    <FiPlus className="w-5 h-5" />
-                  </button>
+              {/* Stoc epuizat / Quantity Selector */}
+              {outOfStock ? (
+                <div className="mb-8 p-4 rounded-xl bg-amber-50 border border-amber-200">
+                  <p className="text-amber-800 font-semibold">Stoc epuizat</p>
+                  <p className="text-amber-700 text-sm mt-1">Acest produs nu este momentan disponibil pentru cumpărare.</p>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <div className="mb-8">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      Cantitate:
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={decreaseQuantity}
+                        disabled={quantity <= 1}
+                        className="w-12 h-12 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-primary-600 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <FiMinus className="w-5 h-5" />
+                      </button>
+                      <span className="text-2xl font-bold text-gray-900 w-16 text-center">{quantity}</span>
+                      <button
+                        onClick={increaseQuantity}
+                        disabled={product.stock != null && quantity >= product.stock}
+                        className="w-12 h-12 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-primary-600 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <FiPlus className="w-5 h-5" />
+                      </button>
+                    </div>
+                    {product.stock != null && product.stock > 0 && (
+                      <p className="text-sm text-gray-500 mt-2">Disponibil: {product.stock} buc.</p>
+                    )}
+                  </div>
 
-              {/* Add to Cart Button */}
-              <button
-                onClick={handleAddToCart}
-                disabled={addedToCart}
-                className={`w-full btn-primary flex items-center justify-center gap-3 text-lg py-4 rounded-xl mb-8 ${
-                  addedToCart
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : ''
-                }`}
-              >
-                {addedToCart ? (
-                  <>
-                    <FiCheckCircle className="w-6 h-6" />
-                    <span>Adăugat în Coș!</span>
-                  </>
-                ) : (
-                  <>
-                    <FiShoppingCart className="w-6 h-6" />
-                    <span>Adaugă în coș</span>
-                  </>
-                )}
-              </button>
+                  {/* Add to Cart Button */}
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={addedToCart}
+                    className={`w-full btn-primary flex items-center justify-center gap-3 text-lg py-4 rounded-xl mb-8 ${
+                      addedToCart
+                        ? 'bg-green-600 hover:bg-green-700'
+                        : ''
+                    }`}
+                  >
+                    {addedToCart ? (
+                      <>
+                        <FiCheckCircle className="w-6 h-6" />
+                        <span>Adăugat în Coș!</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiShoppingCart className="w-6 h-6" />
+                        <span>Adaugă în coș</span>
+                      </>
+                    )}
+                  </button>
+                </>
+              )}
 
               {/* Service Guarantees */}
               <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">

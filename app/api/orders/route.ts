@@ -111,6 +111,7 @@ export async function POST(request: Request) {
       }),
       deliveryMethod: delivery,
       paymentMethod: payment,
+      paymentStatus: order.payment_status || 'pending',
     }
 
     // Notificare către proprietar (ecranul@yahoo.com) – mereu

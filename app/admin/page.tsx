@@ -89,7 +89,7 @@ function AdminDashboardContent() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products?active=false')
+      const res = await fetch('/api/products?active=false&includeOutOfStock=true')
       const data = await res.json()
       // Ensure products is always an array
       setProducts(Array.isArray(data) ? data : [])

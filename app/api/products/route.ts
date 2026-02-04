@@ -20,6 +20,7 @@ export async function GET(request: Request) {
     const slug = searchParams.get('slug')
     const active = searchParams.get('active') !== 'false'
     const includeSubcategories = searchParams.get('includeSubcategories') === 'true'
+    const includeOutOfStock = searchParams.get('includeOutOfStock') === 'true'
 
     let query = supabase
       .from('products')
@@ -47,6 +48,11 @@ export async function GET(request: Request) {
 
     if (active) {
       query = query.eq('active', 1)
+    }
+
+    // În listări (fără slug) nu afișăm produse cu stoc <= 0, decât dacă se cere explicit (ex. admin)
+    if (!slug && !includeOutOfStock) {
+      query = query.gt('stock', 0)
     }
 
     query = query.order('created_at', { ascending: false })

@@ -25,11 +25,27 @@ export async function POST(request: Request) {
   }
 
   try {
-    const formData = await request.formData()
-    const envKey = formData.get('env_key')?.toString()
-    const data = formData.get('data')?.toString()
-    const iv = formData.get('iv')?.toString()
-    const cipher = formData.get('cipher')?.toString() || 'aes-256-cbc'
+    let envKey: string | undefined
+    let data: string | undefined
+    let iv: string | undefined
+    let cipher: string | undefined
+
+    const contentType = request.headers.get('content-type') || ''
+    if (contentType.includes('application/x-www-form-urlencoded')) {
+      const text = await request.text()
+      const params = new URLSearchParams(text)
+      envKey = params.get('env_key') ?? params.get('envKey') ?? undefined
+      data = params.get('data') ?? undefined
+      iv = params.get('iv') ?? undefined
+      cipher = params.get('cipher') ?? undefined
+    } else {
+      const formData = await request.formData()
+      envKey = formData.get('env_key')?.toString() ?? formData.get('envKey')?.toString()
+      data = formData.get('data')?.toString()
+      iv = formData.get('iv')?.toString()
+      cipher = formData.get('cipher')?.toString() ?? undefined
+    }
+    cipher = cipher || 'aes-256-cbc'
 
     if (!envKey || !data || !iv) {
       return new NextResponse(
@@ -66,8 +82,16 @@ export async function POST(request: Request) {
       )
     }
 
-    if (ipn.action === 'confirmed') {
+    const isConfirmed =
+      ipn.action === 'confirmed' || ipn.action === 'confirmat'
+    if (isConfirmed) {
       await db.update('orders', order.id, { payment_status: 'platita' })
+      const { sendPaymentConfirmedEmails } = await import('@/lib/email')
+      sendPaymentConfirmedEmails({
+        orderNumber: order.order_number,
+        customerName: order.customer_name,
+        customerEmail: order.customer_email,
+      }).catch((err) => console.error('Payment confirmed email error:', err))
       return new NextResponse(
         buildConfirmResponseXml(0, 'OK'),
         { status: 200, headers: { 'Content-Type': 'application/xml' } }

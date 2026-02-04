@@ -375,16 +375,22 @@ function ShopContent() {
                       </p>
                     )}
                     <div className="flex items-center justify-end mt-auto">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleAddToCart(product)
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all bg-primary-600 text-white hover:bg-primary-700"
-                      >
-                        <FiPlus className="w-4 h-4" />
-                        Adaugă
-                      </button>
+                      {(product.stock == null || product.stock > 0) ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleAddToCart(product)
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all bg-primary-600 text-white hover:bg-primary-700"
+                        >
+                          <FiPlus className="w-4 h-4" />
+                          Adaugă
+                        </button>
+                      ) : (
+                        <span className="px-4 py-2 rounded-lg font-semibold bg-gray-200 text-gray-600 cursor-not-allowed">
+                          Stoc epuizat
+                        </span>
+                      )}
                     </div>
                   </div>
                 </motion.div>
