@@ -61,8 +61,9 @@ function createTransporter() {
   })
 }
 
-// Generate HTML email template
-function generateOrderEmailHTML(data: OrderEmailData): string {
+// Generate HTML email template (forOwner = true includează "Status plată")
+function generateOrderEmailHTML(data: OrderEmailData, options?: { forOwner?: boolean }): string {
+  const forOwner = options?.forOwner === true
   const itemsHTML = data.items.map(item => `
     <tr>
       <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.product_name}</td>
@@ -134,10 +135,10 @@ function generateOrderEmailHTML(data: OrderEmailData): string {
                     <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Metodă plată:</td>
                     <td style="padding: 8px 0; color: #1f2937; font-size: 14px; text-align: right;">${paymentMethodLabel(data.paymentMethod)}</td>
                   </tr>
-                  <tr>
+                  ${forOwner ? `<tr>
                     <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Status plată:</td>
                     <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${paymentStatusLabel(data.paymentStatus)}</td>
-                  </tr>
+                  </tr>` : ''}
                 </table>
               </div>
               
@@ -217,7 +218,7 @@ export async function sendOrderNotificationToOwner(data: OrderEmailData): Promis
       from: `"ecranul.ro" <${fromEmail}>`,
       to: OWNER_EMAIL,
       subject: `🛒 Comandă nouă ${data.orderNumber} - ecranul.ro`,
-      html: generateOrderEmailHTML(data),
+      html: generateOrderEmailHTML(data, { forOwner: true }),
       text: `
 Comandă nouă - ecranul.ro
 
@@ -281,7 +282,6 @@ Detalii Comandă:
 - Adresă: ${data.customerAddress}
 - Metodă livrare: ${deliveryMethodLabel(data.deliveryMethod)}
 - Metodă plată: ${paymentMethodLabel(data.paymentMethod)}
-- Status plată: ${paymentStatusLabel(data.paymentStatus)}
 
 Produse comandate:
 ${data.items.map(item => `- ${item.product_name} x${item.quantity} = ${(item.price * item.quantity).toFixed(2)} RON`).join('\n')}
