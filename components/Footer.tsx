@@ -118,6 +118,10 @@ export default function Footer() {
           <div className="flex flex-col gap-4 mb-4">
             {/* Legal Links */}
             <div className="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1 text-sm">
+              <Link href="/informatii-legale" className="text-gray-300 hover:text-primary-400 transition-colors font-medium">
+                Informații legale
+              </Link>
+              <span className="text-gray-600 hidden sm:inline">|</span>
               <Link href="/termeni-conditii" className="text-gray-400 hover:text-primary-400 transition-colors">
                 Termeni și Condiții
               </Link>
