@@ -32,21 +32,29 @@ export default function InformatiiLegalePage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="space-y-8">
           {/* Date companie */}
           <section className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Date de contact ale companiei</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Date de identificare și contact</h2>
             <ul className="space-y-3 text-gray-700">
               <li className="flex items-center gap-3">
-                <span className="font-semibold min-w-[100px]">Denumire:</span>
+                <span className="font-semibold min-w-[140px]">Denumire firmă:</span>
+                <span>LNV NETWORK S.R.L.</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="font-semibold min-w-[140px]">Marca / site:</span>
                 <span>ecranul.ro</span>
               </li>
               <li className="flex items-center gap-3">
-                <span className="font-semibold min-w-[100px]">CUI:</span>
-                <span>516219916</span>
+                <span className="font-semibold min-w-[140px]">CUI:</span>
+                <span>51621916</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="font-semibold min-w-[140px]">Nr. Registrul Comerțului:</span>
+                <span>J40/2025/26536005</span>
               </li>
               <li className="flex items-start gap-3">
                 <FiMapPin className="w-5 h-5 mt-0.5 text-primary-600 shrink-0" />
                 <div>
-                  <span className="font-semibold block text-gray-900">Adresă:</span>
-                  <span>Strada Pajurei 7, Sector 1, București, 011318</span>
+                  <span className="font-semibold block text-gray-900">Adresă sediu social:</span>
+                  <span>București, Sector 1, Bulevardul Bucureștii Noi, Nr. 50A, Tronson A+C, Etaj 7, Ap. 43</span>
                 </div>
               </li>
               <li className="flex items-center gap-3">

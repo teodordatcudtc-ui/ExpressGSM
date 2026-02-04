@@ -193,8 +193,17 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Copyright */}
-          <div className="text-center text-gray-400 text-sm">
+          {/* Copyright + date firmă (ANPC/Netopia) */}
+          <div className="text-center text-gray-400 text-sm space-y-1">
+            <p>
+              <Link href="/informatii-legale" className="hover:text-primary-400 transition-colors">
+                LNV NETWORK S.R.L.
+              </Link>
+              {' | '}
+              CUI: 51621916
+              {' | '}
+              Nr. Reg. Com.: J40/2025/26536005
+            </p>
             <p>&copy; {new Date().getFullYear()} ecranul.ro. Toate drepturile rezervate.</p>
           </div>
         </div>

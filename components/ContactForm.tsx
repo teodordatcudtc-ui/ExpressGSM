@@ -73,9 +73,10 @@ export default function ContactForm() {
               <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Date firmă</h3>
                 <ul className="space-y-1 text-gray-700 text-sm">
-                  <li><strong>Denumire:</strong> ecranul.ro</li>
-                  <li><strong>CUI:</strong> 516219916</li>
-                  <li><strong>Adresă:</strong> Strada Pajurei 7, Sector 1, București, 011318</li>
+                  <li><strong>Denumire firmă:</strong> LNV NETWORK S.R.L. (ecranul.ro)</li>
+                  <li><strong>CUI:</strong> 51621916</li>
+                  <li><strong>Nr. Registrul Comerțului:</strong> J40/2025/26536005</li>
+                  <li><strong>Adresă sediu social:</strong> Bulevardul Bucureștii Noi 50A, Tronson A+C, Et. 7, Ap. 43, Sector 1, București</li>
                   <li><strong>Telefon:</strong> <a href="tel:0799665665" className="text-primary-600 hover:text-primary-700">0799665665</a></li>
                   <li><strong>Email:</strong> <a href="mailto:ecranul@yahoo.com" className="text-primary-600 hover:text-primary-700">ecranul@yahoo.com</a></li>
                 </ul>
