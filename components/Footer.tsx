@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { FiPhone, FiMapPin, FiMail, FiFacebook, FiInstagram, FiClock, FiLock } from 'react-icons/fi'
+import { FiPhone, FiMapPin, FiMail, FiClock, FiLock, FiShoppingBag } from 'react-icons/fi'
+import { FaTiktok } from 'react-icons/fa'
 
 const NTPIdentity = dynamic(() => import('ntp-logo-react').then((m) => m.default), { ssr: false })
 
@@ -91,23 +92,39 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Social Media */}
+          {/* Urmărește-ne: TikTok, OLX, Google Maps */}
           <div>
             <h4 className="text-white font-semibold mb-4">Urmărește-ne</h4>
-            <div className="flex space-x-4">
+            <div className="flex flex-wrap gap-3">
               <a
-                href="#"
+                href="https://www.tiktok.com/@ecranul.ro"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors"
-                aria-label="Facebook"
+                aria-label="TikTok ecranul.ro"
+                title="TikTok"
               >
-                <FiFacebook className="w-5 h-5" />
+                <FaTiktok className="w-5 h-5" />
               </a>
               <a
-                href="#"
+                href="https://expressnetwork.olx.ro/home/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors"
-                aria-label="Instagram"
+                aria-label="OLX Express Network"
+                title="OLX"
               >
-                <FiInstagram className="w-5 h-5" />
+                <FiShoppingBag className="w-5 h-5" />
+              </a>
+              <a
+                href="https://www.google.com/maps/place/Express+Gsm+Network/@44.4807311,26.041028,17z/data=!4m10!1m2!2m1!1sexpress+network+!3m6!1s0x40b20308f1c15c63:0x8dff8f37ec1047ba!8m2!3d44.4807273!4d26.0436029!15sCg9leHByZXNzIG5ldHdvcmsiA4gBAVoRIg9leHByZXNzIG5ldHdvcmuSARhtb2JpbGVfcGhvbmVfcmVwYWlyX3Nob3DgAQA!16s%2Fg%2F11rtqyc6wg?entry=ttu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors"
+                aria-label="Locație Google Maps"
+                title="Google Maps"
+              >
+                <FiMapPin className="w-5 h-5" />
               </a>
             </div>
           </div>
