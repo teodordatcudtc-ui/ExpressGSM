@@ -24,7 +24,7 @@ interface Order {
   status: string
   payment_status: string
   created_at: string
-  delivery_method?: 'curier_rapid' | 'ridicare_personala' | null
+  delivery_method?: 'curier_rapid' | 'ridicare_personala' | 'curier_verificare' | null
   payment_method?: 'ramburs' | 'card_online' | null
   items: OrderItem[]
 }
