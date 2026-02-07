@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
-import { FiCheckCircle, FiShoppingCart, FiUser, FiMail, FiPhone, FiMapPin, FiX, FiLogOut, FiTruck, FiPackage } from 'react-icons/fi'
+import { FiCheckCircle, FiShoppingCart, FiUser, FiMail, FiPhone, FiMapPin, FiX, FiLogOut, FiTruck, FiPackage, FiCreditCard, FiDollarSign } from 'react-icons/fi'
 import { useCartStore } from '@/store/cartStore'
 import { useUserStore } from '@/store/userStore'
 import { counties, countries } from '@/lib/romania-data'
@@ -31,6 +31,7 @@ function CheckoutPageContent() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState<'ramburs' | 'card_online'>('ramburs')
   const [deliveryMethod, setDeliveryMethod] = useState<'curier_rapid' | 'ridicare_personala' | 'curier_verificare'>('curier_rapid')
 
   const SHIPPING_COST_CURIER = 25
@@ -126,6 +127,7 @@ function CheckoutPageContent() {
         customer_phone: data.customer_phone,
         customer_address,
         user_id: user?.id ?? null,
+        payment_method: paymentMethod,
         delivery_method: deliveryMethod,
         items: items.map(item => ({
           product_id: item.product_id,
@@ -308,7 +310,49 @@ function CheckoutPageContent() {
                   )}
                 </div>
 
-                {/* Metodă livrare */}
+                {/* Metodă de plată – o alegi prima dată, ca să apară opțiunea Cu verificare colet doar la card */}
+                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Metodă de plată *
+                  </label>
+                  <div className="flex flex-wrap gap-4">
+                    <label
+                      className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors flex-1 min-w-[140px] ${
+                        paymentMethod === 'ramburs' ? 'border-primary-600 bg-primary-50' : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="payment_method"
+                        checked={paymentMethod === 'ramburs'}
+                        onChange={() => {
+                          setPaymentMethod('ramburs')
+                          if (deliveryMethod === 'curier_verificare') setDeliveryMethod('curier_rapid')
+                        }}
+                        className="text-primary-600"
+                      />
+                      <FiDollarSign className="w-5 h-5 text-primary-600" />
+                      <span className="font-semibold text-gray-900">La ramburs</span>
+                    </label>
+                    <label
+                      className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors flex-1 min-w-[140px] ${
+                        paymentMethod === 'card_online' ? 'border-primary-600 bg-primary-50' : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="payment_method"
+                        checked={paymentMethod === 'card_online'}
+                        onChange={() => setPaymentMethod('card_online')}
+                        className="text-primary-600"
+                      />
+                      <FiCreditCard className="w-5 h-5 text-primary-600" />
+                      <span className="font-semibold text-gray-900">Plată cu cardul online</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Metodă livrare – Cu verificare colet apare doar dacă ai ales plată cu cardul */}
                 <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">
                     Metodă de livrare *
@@ -331,11 +375,37 @@ function CheckoutPageContent() {
                       <div className="flex-1">
                         <span className="font-semibold text-gray-900 flex items-center gap-2">
                           <FiTruck className="w-5 h-5 text-primary-600" />
-                          Curier rapid – Livrare la adresă
+                          Fără verificare colet – Livrare la adresă
                         </span>
-                        <p className="text-sm text-gray-600 mt-0.5">28,00 lei</p>
+                        <p className="text-sm text-gray-600 mt-0.5">25,00 lei</p>
                       </div>
                     </label>
+                    {paymentMethod === 'card_online' && (
+                      <label
+                        className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                          deliveryMethod === 'curier_verificare'
+                            ? 'border-primary-600 bg-primary-50'
+                            : 'border-gray-200 bg-white hover:border-gray-300'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="delivery_method"
+                          checked={deliveryMethod === 'curier_verificare'}
+                          onChange={() => setDeliveryMethod('curier_verificare')}
+                          className="mt-1 text-primary-600"
+                        />
+                        <div className="flex-1">
+                          <span className="font-semibold text-gray-900 flex items-center gap-2">
+                            <FiTruck className="w-5 h-5 text-primary-600" />
+                            Cu verificare colet
+                          </span>
+                          <p className="text-sm text-gray-600 mt-0.5">
+                            45,00 lei (inclusiv transport). Disponibil doar cu plată card online.
+                          </p>
+                        </div>
+                      </label>
+                    )}
                     <label
                       className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
                         deliveryMethod === 'ridicare_personala'

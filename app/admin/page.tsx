@@ -111,7 +111,10 @@ function AdminDashboardContent() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/categories')
+      const res = await fetch(`/api/categories?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' },
+      })
       if (!res.ok) {
         console.error('Failed to fetch categories:', res.status, res.statusText)
         setCategories([])

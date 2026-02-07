@@ -15,6 +15,7 @@ interface CheckoutStoredData {
   customer_phone: string
   customer_address: string
   user_id: number | null
+  payment_method?: 'ramburs' | 'card_online'
   delivery_method: 'curier_rapid' | 'ridicare_personala' | 'curier_verificare'
   items: { product_id: number; product_name: string; quantity: number; price: number }[]
   subtotal: number
@@ -48,8 +49,10 @@ export default function CheckoutPlataPage() {
         return
       }
       setData(parsed)
-      if (parsed?.delivery_method === 'curier_verificare') {
+      if (parsed?.delivery_method === 'curier_verificare' || parsed?.payment_method === 'card_online') {
         setPaymentMethod('card_online')
+      } else if (parsed?.payment_method === 'ramburs') {
+        setPaymentMethod('ramburs')
       }
     } catch {
       router.replace('/checkout')
