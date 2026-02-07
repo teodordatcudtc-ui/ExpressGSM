@@ -129,7 +129,7 @@ export default function DatabaseViewPage() {
       if (response.ok) {
         setShowAddCategoryForm(false)
         setCategoryForm({ name: '', slug: '', description: '', image: '', parent_id: null })
-        fetchTableData(activeTable)
+        fetchTableData(activeTable, true)
         fetchStats()
       } else {
         const error = await response.json()

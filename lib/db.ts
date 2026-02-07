@@ -2,9 +2,9 @@
 import { supabase } from './supabase'
 
 export const db = {
-  // Get all rows from a table
+  // Get all rows from a table (range explicit ca să nu se aplice limita implicită PostgREST ~25)
   async getAll(table: string, orderBy?: string) {
-    let query = supabase.from(table).select('*')
+    let query = supabase.from(table).select('*').range(0, 9999)
     if (orderBy) {
       const [column, direction] = orderBy.split(' ')
       query = query.order(column, { ascending: direction?.toLowerCase() !== 'desc' })
@@ -25,9 +25,9 @@ export const db = {
     return data
   },
 
-  // Get rows with filter
+  // Get rows with filter (range explicit pentru a returna toate rândurile)
   async getWhere(table: string, filters: Record<string, any>, orderBy?: string) {
-    let query = supabase.from(table).select('*')
+    let query = supabase.from(table).select('*').range(0, 9999)
     
     Object.entries(filters).forEach(([key, value]) => {
       query = query.eq(key, value)
