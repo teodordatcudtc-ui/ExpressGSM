@@ -383,6 +383,15 @@ export default function ProductPage() {
                 </>
               )}
 
+              {/* Montaj display – doar pentru categoria Display */}
+              {(product.category_slug === 'display' || product.category_slug?.startsWith('display-')) && (
+                <div className="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-xl">
+                  <p className="text-sm font-semibold text-primary-800">Montaj pe loc cu programare</p>
+                  <p className="text-base font-bold text-primary-700">50 lei</p>
+                  <p className="text-xs text-gray-600 mt-1">Programare la telefon sau WhatsApp.</p>
+                </div>
+              )}
+
               {/* Service Guarantees */}
               <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">
                 <div className="text-center">
@@ -401,7 +410,7 @@ export default function ProductPage() {
                     </div>
                   </div>
                   <p className="text-sm font-semibold text-gray-900 mb-1">Garanție</p>
-                  <p className="text-xs text-gray-600">2 ani</p>
+                  <p className="text-xs text-gray-600">Inclusă</p>
                 </div>
                 <div className="text-center">
                   <div className="flex justify-center mb-2">

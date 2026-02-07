@@ -18,10 +18,16 @@ export async function GET(request: Request) {
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )
     } else {
-      // Get all orders (for admin)
-      orders = await db.getAll('orders', 'created_at DESC')
+      // Get all orders (for admin) – exclude card orders not yet paid (abandoned checkout)
+      const all = await db.getAll('orders', 'created_at DESC')
+      orders = (all as any[]).filter(
+        (o: any) =>
+          o.payment_method !== 'card_online' ||
+          o.payment_status === 'platita' ||
+          o.payment_status === 'paid'
+      )
     }
-    
+
     // Get item counts for each order
     const ordersWithCounts = await Promise.all(
       (orders as any[]).map(async (order: any) => {
@@ -50,7 +56,10 @@ export async function POST(request: Request) {
     }
     const customerEmail = (customer_email && String(customer_email).trim()) || ''
 
-    const delivery = delivery_method === 'ridicare_personala' ? 'ridicare_personala' : 'curier_rapid'
+    const delivery =
+      delivery_method === 'ridicare_personala' ? 'ridicare_personala'
+      : delivery_method === 'curier_verificare' ? 'curier_verificare'
+      : 'curier_rapid'
     const payment = payment_method === 'card_online' ? 'card_online' : 'ramburs'
 
     // Generate order number
@@ -67,6 +76,7 @@ export async function POST(request: Request) {
       user_id: user_id ? parseInt(user_id) : null,
       delivery_method: delivery,
       payment_method: payment,
+      status: 'processing',
     }
     const order = (await db.insert('orders', orderData)) as any
 
@@ -118,10 +128,12 @@ export async function POST(request: Request) {
     sendOrderNotificationToOwner(emailPayload).catch((error) => {
       console.error('Failed to send owner notification:', error)
     })
-    // Confirmare către client – doar dacă a dat email
-    sendOrderConfirmationEmail(emailPayload).catch((error) => {
-      console.error('Failed to send confirmation email:', error)
-    })
+    // Confirmare către client – doar pentru ramburs; pentru card_online se trimite după confirmarea plății (IPN)
+    if (payment !== 'card_online') {
+      sendOrderConfirmationEmail(emailPayload).catch((error) => {
+        console.error('Failed to send confirmation email:', error)
+      })
+    }
 
     return NextResponse.json({ ...order, items: orderItems }, { status: 201 })
   } catch (error: any) {

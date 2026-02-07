@@ -31,9 +31,10 @@ function CheckoutPageContent() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
-  const [deliveryMethod, setDeliveryMethod] = useState<'curier_rapid' | 'ridicare_personala'>('curier_rapid')
+  const [deliveryMethod, setDeliveryMethod] = useState<'curier_rapid' | 'ridicare_personala' | 'curier_verificare'>('curier_rapid')
 
-  const SHIPPING_COST = 28
+  const SHIPPING_COST_CURIER = 25
+  const SHIPPING_COST_VERIFICARE = 45
   const PICKUP_ADDRESS = 'Pajurei 7, Sector 1, București, 011318'
   
   const {
@@ -81,7 +82,10 @@ function CheckoutPageContent() {
   }, [isAuthenticated, user, setValue, fetchUserData])
 
   const subtotal = getTotal()
-  const shippingCost = deliveryMethod === 'curier_rapid' ? SHIPPING_COST : 0
+  const shippingCost =
+    deliveryMethod === 'curier_verificare' ? SHIPPING_COST_VERIFICARE
+    : deliveryMethod === 'curier_rapid' ? SHIPPING_COST_CURIER
+    : 0
   const total = subtotal + shippingCost
 
   const placedFromUrl = searchParams.get('placed')
@@ -109,7 +113,10 @@ function CheckoutPageContent() {
       : `${data.customer_address}, ${data.city}, ${data.county}, ${data.country}`
 
     const subtotal = getTotal()
-    const shippingCost = deliveryMethod === 'curier_rapid' ? SHIPPING_COST : 0
+    const shippingCost =
+      deliveryMethod === 'curier_verificare' ? SHIPPING_COST_VERIFICARE
+      : deliveryMethod === 'curier_rapid' ? SHIPPING_COST_CURIER
+      : 0
     const total = subtotal + shippingCost
 
     try {
@@ -356,7 +363,7 @@ function CheckoutPageContent() {
                   </div>
                 </div>
 
-                {deliveryMethod === 'curier_rapid' && (
+                {(deliveryMethod === 'curier_rapid' || deliveryMethod === 'curier_verificare') && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
@@ -482,7 +489,7 @@ function CheckoutPageContent() {
                   <span>{subtotal.toFixed(2)} RON</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
-                  <span>Livrare ({deliveryMethod === 'curier_rapid' ? 'Curier rapid' : 'Ridicare personală'}):</span>
+                  <span>Livrare ({deliveryMethod === 'curier_verificare' ? 'Cu verificare colet' : deliveryMethod === 'curier_rapid' ? 'Curier rapid' : 'Ridicare personală'}):</span>
                   <span>{shippingCost === 0 ? 'Gratuit' : `${shippingCost.toFixed(2)} RON`}</span>
                 </div>
                 <div className="flex justify-between text-xl font-bold pt-2 border-t mt-2">

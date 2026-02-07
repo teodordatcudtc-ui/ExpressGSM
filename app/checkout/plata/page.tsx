@@ -15,7 +15,7 @@ interface CheckoutStoredData {
   customer_phone: string
   customer_address: string
   user_id: number | null
-  delivery_method: 'curier_rapid' | 'ridicare_personala'
+  delivery_method: 'curier_rapid' | 'ridicare_personala' | 'curier_verificare'
   items: { product_id: number; product_name: string; quantity: number; price: number }[]
   subtotal: number
   shippingCost: number
@@ -48,6 +48,9 @@ export default function CheckoutPlataPage() {
         return
       }
       setData(parsed)
+      if (parsed?.delivery_method === 'curier_verificare') {
+        setPaymentMethod('card_online')
+      }
     } catch {
       router.replace('/checkout')
     }
@@ -55,6 +58,10 @@ export default function CheckoutPlataPage() {
 
   const handlePlaceOrder = async () => {
     if (!data) return
+    if (data.delivery_method === 'curier_verificare' && paymentMethod !== 'card_online') {
+      alert('Opțiunea „Cu verificare colet” necesită plată cu cardul online.')
+      return
+    }
     setIsProcessing(true)
     try {
       const orderRes = await fetch('/api/orders', {
@@ -168,7 +175,7 @@ export default function CheckoutPlataPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">
-                  Livrare ({data.delivery_method === 'curier_rapid' ? 'Curier rapid' : 'Ridicare personală'})
+                  Livrare ({data.delivery_method === 'curier_verificare' ? 'Cu verificare colet' : data.delivery_method === 'curier_rapid' ? 'Curier rapid' : 'Ridicare personală'})
                 </span>
                 <span>{data.shippingCost === 0 ? 'Gratuit' : `${data.shippingCost.toFixed(2)} RON`}</span>
               </div>
@@ -181,14 +188,21 @@ export default function CheckoutPlataPage() {
 
           {/* Metodă plată */}
           <div className="space-y-3 mb-8">
+            {data.delivery_method === 'curier_verificare' && (
+              <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                Livrarea cu verificare colet este disponibilă doar cu plată cu cardul online.
+              </p>
+            )}
             <label className="block text-sm font-semibold text-gray-700">
               Alege metoda de plată *
             </label>
             <label
-              className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
-                paymentMethod === 'ramburs'
-                  ? 'border-primary-600 bg-primary-50'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
+              className={`flex items-start gap-3 p-4 rounded-lg border-2 transition-colors ${
+                data.delivery_method === 'curier_verificare'
+                  ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-75'
+                  : paymentMethod === 'ramburs'
+                  ? 'border-primary-600 bg-primary-50 cursor-pointer'
+                  : 'border-gray-200 bg-white hover:border-gray-300 cursor-pointer'
               }`}
             >
               <input
@@ -196,6 +210,7 @@ export default function CheckoutPlataPage() {
                 name="payment_method"
                 checked={paymentMethod === 'ramburs'}
                 onChange={() => setPaymentMethod('ramburs')}
+                disabled={data.delivery_method === 'curier_verificare'}
                 className="mt-1 text-primary-600"
               />
               <div className="flex-1">
@@ -203,7 +218,9 @@ export default function CheckoutPlataPage() {
                   <FiDollarSign className="w-5 h-5 text-primary-600" />
                   La ramburs
                 </span>
-                <p className="text-sm text-gray-600 mt-0.5">Plătești la primirea coletului</p>
+                <p className="text-sm text-gray-600 mt-0.5">
+                  {data.delivery_method === 'curier_verificare' ? 'Indisponibil pentru livrare cu verificare colet' : 'Plătești la primirea coletului'}
+                </p>
               </div>
             </label>
             <label

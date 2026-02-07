@@ -118,17 +118,14 @@ export default function OrderDetailPage() {
             </div>
             <div className="flex gap-2 flex-wrap">
               <span className={`px-3 py-1 rounded text-sm font-semibold ${
-                order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
-                'bg-yellow-100 text-yellow-800'
+                order.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
               }`}>
-                {order.status}
+                {order.status === 'completed' ? 'Finalizată' : 'În procesare'}
               </span>
               <span className={`px-3 py-1 rounded text-sm font-semibold ${
-                (order.payment_status === 'paid' || order.payment_status === 'platita') ? 'bg-green-100 text-green-800' :
-                'bg-red-100 text-red-800'
+                (order.payment_status === 'paid' || order.payment_status === 'platita') ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'
               }`}>
-                {order.payment_status}
+                {(order.payment_status === 'paid' || order.payment_status === 'platita') ? 'Plătit' : 'Neplatit'}
               </span>
             </div>
           </div>
@@ -154,7 +151,9 @@ export default function OrderDetailPage() {
                 <p className="font-semibold break-words">
                   {order.delivery_method === 'ridicare_personala'
                     ? 'Ridicare personală din depozit (Pajurei 7, Sector 1, București, 011318)'
-                    : 'Curier rapid – Livrare la adresă (28,00 lei)'}
+                    : order.delivery_method === 'curier_verificare'
+                    ? 'Curier cu verificare colet (45,00 lei)'
+                    : 'Curier rapid – Livrare la adresă (25,00 lei)'}
                 </p>
               </div>
               <div className="sm:col-span-2">
@@ -196,34 +195,18 @@ export default function OrderDetailPage() {
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
-            {(order.payment_method === 'card_online' &&
-              order.payment_status !== 'platita' &&
-              order.payment_status !== 'paid') && (
+          {/* Actions – doar Finalizează comanda */}
+          {order.status !== 'completed' && (
+            <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
               <button
-                onClick={() => updateOrderStatus(order?.status || 'pending', 'platita')}
-                className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 flex items-center justify-center gap-2 w-full sm:w-auto"
+                onClick={() => updateOrderStatus('completed', order.payment_status === 'platita' || order.payment_status === 'paid' ? order.payment_status : undefined)}
+                className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <FiCheck className="w-5 h-5" />
-                Marchează plată primită (Netopia)
+                Finalizează Comanda
               </button>
-            )}
-            <button
-              onClick={() => updateOrderStatus('processing')}
-              className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto"
-            >
-              <FiCheck className="w-5 h-5" />
-              Marchează ca Procesare
-            </button>
-            <button
-              onClick={() => updateOrderStatus('completed', order.payment_status === 'platita' || order.payment_status === 'paid' ? order.payment_status : 'paid')}
-              className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
-            >
-              <FiCheck className="w-5 h-5" />
-              Finalizează Comanda
-            </button>
-          </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>

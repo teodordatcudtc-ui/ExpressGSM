@@ -30,7 +30,8 @@ export interface OrderEmailData {
 
 function deliveryMethodLabel(value?: string): string {
   if (value === 'ridicare_personala') return 'Ridicare personală din depozit (Pajurei 7, București – gratuit)'
-  if (value === 'curier_rapid') return 'Curier rapid – Livrare la adresă (28,00 lei)'
+  if (value === 'curier_rapid') return 'Curier rapid – Livrare la adresă (25,00 lei)'
+  if (value === 'curier_verificare') return 'Curier cu verificare colet (45,00 lei)'
   return value || '—'
 }
 function paymentMethodLabel(value?: string): string {

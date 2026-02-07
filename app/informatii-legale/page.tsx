@@ -110,6 +110,12 @@ export default function InformatiiLegalePage() {
                 </Link>
               </li>
               <li>
+                <span className="font-semibold text-gray-900">Formular și procedură retur:</span>{' '}
+                <Link href="/formular-retur" className="text-primary-600 hover:text-primary-700 break-all">
+                  {baseUrl}/formular-retur
+                </Link>
+              </li>
+              <li>
                 <span className="font-semibold text-gray-900">Politica de utilizare Cookie-uri:</span>{' '}
                 <Link href="/politica-cookie" className="text-primary-600 hover:text-primary-700 break-all">
                   {baseUrl}/politica-cookie

@@ -14,11 +14,13 @@ export default function DatabaseViewPage() {
   const [tableData, setTableData] = useState<TableData[]>([])
   const [loading, setLoading] = useState(false)
   const [showAddCategoryForm, setShowAddCategoryForm] = useState(false)
+  const [addCategoryMode, setAddCategoryMode] = useState<'category' | 'subcategory'>('category')
   const [categoryForm, setCategoryForm] = useState({
     name: '',
     slug: '',
     description: '',
     image: '',
+    parent_id: null as number | null,
   })
   const [stats, setStats] = useState({
     categories: 0,
@@ -108,26 +110,40 @@ export default function DatabaseViewPage() {
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      const payload: Record<string, unknown> = {
+        name: categoryForm.name,
+        slug: categoryForm.slug,
+        description: categoryForm.description || '',
+        image: categoryForm.image || '',
+      }
+      if (addCategoryMode === 'subcategory' && categoryForm.parent_id) {
+        payload.parent_id = categoryForm.parent_id
+      }
+
       const response = await fetch('/api/admin/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(categoryForm),
+        body: JSON.stringify(payload),
       })
 
       if (response.ok) {
         setShowAddCategoryForm(false)
-        setCategoryForm({ name: '', slug: '', description: '', image: '' })
+        setCategoryForm({ name: '', slug: '', description: '', image: '', parent_id: null })
         fetchTableData(activeTable)
         fetchStats()
       } else {
         const error = await response.json()
-        alert(error.error || 'Eroare la adăugare categorie')
+        alert(error.error || (addCategoryMode === 'subcategory' ? 'Eroare la adăugare subcategorie' : 'Eroare la adăugare categorie'))
       }
     } catch (error) {
       console.error('Error adding category:', error)
-      alert('Eroare la adăugare categorie')
+      alert(addCategoryMode === 'subcategory' ? 'Eroare la adăugare subcategorie' : 'Eroare la adăugare categorie')
     }
   }
+
+  const mainCategories = activeTable === 'categories'
+    ? (tableData as TableData[]).filter((row) => row.parent_id == null)
+    : []
 
   const handleDeleteCategory = async (id: number) => {
     if (!confirm('Ești sigur că vrei să ștergi această categorie?\n\nDacă categoria este folosită de produse, nu va putea fi ștearsă.')) return
@@ -268,13 +284,30 @@ export default function DatabaseViewPage() {
               </p>
             </div>
             {activeTable === 'categories' && (
-              <button
-                onClick={() => setShowAddCategoryForm(true)}
-                className="btn-primary flex items-center gap-2"
-              >
-                <FiPlus className="w-5 h-5" />
-                Adaugă Categorie
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => {
+                    setAddCategoryMode('category')
+                    setCategoryForm({ name: '', slug: '', description: '', image: '', parent_id: null })
+                    setShowAddCategoryForm(true)
+                  }}
+                  className="btn-primary flex items-center gap-2"
+                >
+                  <FiPlus className="w-5 h-5" />
+                  Adaugă Categorie
+                </button>
+                <button
+                  onClick={() => {
+                    setAddCategoryMode('subcategory')
+                    setCategoryForm({ name: '', slug: '', description: '', image: '', parent_id: null })
+                    setShowAddCategoryForm(true)
+                  }}
+                  className="btn-secondary flex items-center gap-2"
+                >
+                  <FiPlus className="w-5 h-5" />
+                  Adaugă Subcategorie
+                </button>
+              </div>
             )}
           </div>
 
@@ -287,11 +320,13 @@ export default function DatabaseViewPage() {
                 className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full"
               >
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900">Adaugă Categorie Nouă</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {addCategoryMode === 'subcategory' ? 'Adaugă Subcategorie' : 'Adaugă Categorie Nouă'}
+                  </h3>
                   <button
                     onClick={() => {
                       setShowAddCategoryForm(false)
-                      setCategoryForm({ name: '', slug: '', description: '', image: '' })
+                      setCategoryForm({ name: '', slug: '', description: '', image: '', parent_id: null })
                     }}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
@@ -299,18 +334,43 @@ export default function DatabaseViewPage() {
                   </button>
                 </div>
                 <form onSubmit={handleAddCategory} className="space-y-4">
+                  {addCategoryMode === 'subcategory' && (
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Categorie părinte *
+                      </label>
+                      <select
+                        value={categoryForm.parent_id ?? ''}
+                        onChange={(e) => setCategoryForm({ ...categoryForm, parent_id: e.target.value ? parseInt(e.target.value) : null })}
+                        required={addCategoryMode === 'subcategory'}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600"
+                      >
+                        <option value="">Selectează categoria părinte</option>
+                        {mainCategories.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nume Categorie *
+                      Nume {addCategoryMode === 'subcategory' ? 'Subcategorie' : 'Categorie'} *
                     </label>
                     <input
                       type="text"
                       value={categoryForm.name}
                       onChange={(e) => {
+                        const name = e.target.value
+                        const baseSlug = generateSlug(name)
+                        const slug = addCategoryMode === 'subcategory' && categoryForm.parent_id
+                          ? (mainCategories.find((c) => c.id === categoryForm.parent_id)?.slug ?? '') + '-' + baseSlug
+                          : baseSlug
                         setCategoryForm({
                           ...categoryForm,
-                          name: e.target.value,
-                          slug: generateSlug(e.target.value),
+                          name,
+                          slug,
                         })
                       }}
                       required
@@ -354,13 +414,13 @@ export default function DatabaseViewPage() {
                   </div>
                   <div className="flex gap-4 pt-4">
                     <button type="submit" className="btn-primary flex-1">
-                      Adaugă Categorie
+                      {addCategoryMode === 'subcategory' ? 'Adaugă Subcategorie' : 'Adaugă Categorie'}
                     </button>
                     <button
                       type="button"
                       onClick={() => {
                         setShowAddCategoryForm(false)
-                        setCategoryForm({ name: '', slug: '', description: '', image: '' })
+                        setCategoryForm({ name: '', slug: '', description: '', image: '', parent_id: null })
                       }}
                       className="btn-secondary flex-1"
                     >

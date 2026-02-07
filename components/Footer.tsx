@@ -158,6 +158,10 @@ export default function Footer() {
               <Link href="/politica-anulare" className="text-gray-400 hover:text-primary-400 transition-colors">
                 Politica de anulare
               </Link>
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <Link href="/formular-retur" className="text-gray-400 hover:text-primary-400 transition-colors">
+                Formular retur
+              </Link>
             </div>
 
             {/* Măsurile ANPC (SAL) + SOL + Logo NETOPIA - Ordin 449/2022 */}

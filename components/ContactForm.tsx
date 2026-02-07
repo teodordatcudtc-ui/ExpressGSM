@@ -85,7 +85,7 @@ export default function ContactForm() {
 
             <div className="space-y-6">
               <a
-                href="/wa"
+                href="https://wa.me/40799665665"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-start space-x-4 p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all group"
@@ -152,7 +152,7 @@ export default function ContactForm() {
             </div>
             
             <a
-              href="/wa"
+              href="https://wa.me/40799665665"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-colors shadow-lg hover:shadow-xl"
