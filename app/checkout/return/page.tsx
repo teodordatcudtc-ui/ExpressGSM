@@ -7,14 +7,16 @@ import { FiCheckCircle, FiArrowLeft } from 'react-icons/fi'
 
 /**
  * Netopia redirects the user here after payment (return URL).
- * Query: order_number (our order number).
- * We show success and link to checkout success with placed=order_number.
+ * Query: order_number, token (token semnat pentru confirmare plată).
+ * Apelăm confirm-return ca să marchem comanda ca plătită, apoi afișăm success.
  */
 function ReturnContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const orderNumber = searchParams.get('order_number')
+  const token = searchParams.get('token')
   const [mounted, setMounted] = useState(false)
+  const [confirmDone, setConfirmDone] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -22,11 +24,26 @@ function ReturnContent() {
 
   useEffect(() => {
     if (!mounted || !orderNumber) return
+    if (token) {
+      fetch('/api/netopia/confirm-return', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_number: orderNumber, token }),
+      })
+        .then(() => setConfirmDone(true))
+        .catch(() => setConfirmDone(true))
+    } else {
+      setConfirmDone(true)
+    }
+  }, [mounted, orderNumber, token])
+
+  useEffect(() => {
+    if (!mounted || !orderNumber || !confirmDone) return
     const t = setTimeout(() => {
       router.replace(`/checkout?placed=${encodeURIComponent(orderNumber)}`)
     }, 3000)
     return () => clearTimeout(t)
-  }, [mounted, orderNumber, router])
+  }, [mounted, orderNumber, confirmDone, router])
 
   if (!mounted) {
     return (
@@ -49,6 +66,8 @@ function ReturnContent() {
     )
   }
 
+  const stillConfirming = token && !confirmDone
+
   return (
     <div className="section-padding bg-gray-50 min-h-screen flex items-center justify-center">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
@@ -58,9 +77,12 @@ function ReturnContent() {
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Plată finalizată</h2>
         <p className="text-gray-600 mb-4">
           Comanda <span className="font-bold text-primary-600">{orderNumber}</span> a fost primită.
+          {stillConfirming && (
+            <span className="block mt-2 text-sm text-gray-500">Confirmăm plata...</span>
+          )}
         </p>
         <p className="text-sm text-gray-500 mb-6">
-          Ești redirecționat automat la pagina de confirmare...
+          {stillConfirming ? 'Se încarcă...' : 'Ești redirecționat automat la pagina de confirmare...'}
         </p>
         <Link
           href={`/checkout?placed=${encodeURIComponent(orderNumber)}`}

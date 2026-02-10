@@ -195,9 +195,20 @@ export default function OrderDetailPage() {
             </div>
           </div>
 
-          {/* Actions – doar Finalizează comanda */}
-          {order.status !== 'completed' && (
-            <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
+          {/* Acțiuni */}
+          <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
+            {order.payment_method === 'card_online' &&
+              order.payment_status !== 'platita' &&
+              order.payment_status !== 'paid' && (
+                <button
+                  onClick={() => updateOrderStatus(order?.status || 'processing', 'platita')}
+                  className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 flex items-center justify-center gap-2 w-full sm:w-auto"
+                >
+                  <FiCheck className="w-5 h-5" />
+                  Marchează plată primită (Netopia)
+                </button>
+              )}
+            {order.status !== 'completed' && (
               <button
                 onClick={() => updateOrderStatus('completed', order.payment_status === 'platita' || order.payment_status === 'paid' ? order.payment_status : undefined)}
                 className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
@@ -205,8 +216,8 @@ export default function OrderDetailPage() {
                 <FiCheck className="w-5 h-5" />
                 Finalizează Comanda
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </motion.div>
       </div>
     </div>

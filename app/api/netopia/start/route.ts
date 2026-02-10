@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server'
+import crypto from 'crypto'
 import db from '@/lib/db'
 import { encryptPaymentRequest, type NetopiaPaymentPayload } from '@/lib/netopia'
 
 export const dynamic = 'force-dynamic'
+
+function getReturnToken(orderNumber: string, signature: string): string {
+  return crypto.createHmac('sha256', signature).update(orderNumber).digest('hex')
+}
 
 function getBaseUrl(request: Request): string {
   const url = new URL(request.url)
@@ -54,12 +59,13 @@ export async function POST(request: Request) {
     const email = order.customer_email || 'client@expressgsm.ro'
     const mobile = order.customer_phone || ''
 
+    const returnToken = getReturnToken(order.order_number, sig)
     const payload: NetopiaPaymentPayload = {
       orderId: order.order_number,
       amount,
       currency: 'RON',
       details: `Comandă ${order.order_number}`,
-      returnUrl: `${baseUrl}/checkout/return?order_number=${encodeURIComponent(order.order_number)}`,
+      returnUrl: `${baseUrl}/checkout/return?order_number=${encodeURIComponent(order.order_number)}&token=${returnToken}`,
       confirmUrl: `${baseUrl}/api/netopia/confirm`,
       billing: {
         first_name: firstName,

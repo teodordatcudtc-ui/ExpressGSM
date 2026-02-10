@@ -18,14 +18,8 @@ export async function GET(request: Request) {
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )
     } else {
-      // Get all orders (for admin) – exclude card orders not yet paid (abandoned checkout)
-      const all = await db.getAll('orders', 'created_at DESC')
-      orders = (all as any[]).filter(
-        (o: any) =>
-          o.payment_method !== 'card_online' ||
-          o.payment_status === 'platita' ||
-          o.payment_status === 'paid'
-      )
+      // Get all orders (for admin) – afișăm toate comenzile
+      orders = await db.getAll('orders', 'created_at DESC')
     }
 
     // Get item counts for each order

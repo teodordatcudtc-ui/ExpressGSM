@@ -58,19 +58,25 @@ export async function POST(request: Request) {
     const decrypted = decryptIpn(privateKeyPem, iv, envKey, data, cipher)
     const ipn = await parseIpnXml(decrypted)
 
-    const orderNumber = ipn.orderId
-    if (!orderNumber) {
+    const orderIdFromIpn = ipn.orderId
+    if (!orderIdFromIpn) {
       return new NextResponse(
         buildConfirmResponseXml(3, 'Missing order id in IPN'),
         { status: 400, headers: { 'Content-Type': 'application/xml' } }
       )
     }
 
-    const orders = (await db.getWhere('orders', { order_number: orderNumber })) as any[]
-    const order = orders?.[0]
+    let order: any = null
+    const byNumber = (await db.getWhere('orders', { order_number: orderIdFromIpn })) as any[]
+    if (byNumber?.length) {
+      order = byNumber[0]
+    }
+    if (!order && /^\d+$/.test(String(orderIdFromIpn).trim())) {
+      order = await db.getById('orders', parseInt(orderIdFromIpn, 10))
+    }
     if (!order) {
       return new NextResponse(
-        buildConfirmResponseXml(4, `Order not found: ${orderNumber}`),
+        buildConfirmResponseXml(4, `Order not found: ${orderIdFromIpn}`),
         { status: 404, headers: { 'Content-Type': 'application/xml' } }
       )
     }
