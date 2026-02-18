@@ -95,7 +95,7 @@ export default function TermsConditionsPage() {
               </p>
             </div>
             <p className="text-gray-700 leading-relaxed mt-4">
-              Consultați și <Link href="/politica-retur" className="text-primary-600 hover:text-primary-700 font-semibold">Politica de retur</Link>, <Link href="/garantii" className="text-primary-600 hover:text-primary-700 font-semibold">Garanțiile</Link> și <Link href="/politica-livrare#service-curier" className="text-primary-600 hover:text-primary-700 font-semibold">Service prin curier</Link>.
+              Consultați și <Link href="/politica-retur" className="text-primary-600 hover:text-primary-700 font-semibold">Politica de retur</Link>, <Link href="/garantii" className="text-primary-600 hover:text-primary-700 font-semibold">Garanțiile</Link> și <Link href="/service-prin-curier" className="text-primary-600 hover:text-primary-700 font-semibold">Service prin curier</Link>.
             </p>
           </section>
         </motion.div>

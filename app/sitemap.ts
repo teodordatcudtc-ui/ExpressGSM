@@ -60,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/politica-livrare`,
+      url: `${baseUrl}/service-prin-curier`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.3,

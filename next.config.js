@@ -4,6 +4,7 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/politica-anulare', destination: '/politica-retur', permanent: true },
+      { source: '/politica-livrare', destination: '/service-prin-curier', permanent: true },
     ]
   },
   images: {

@@ -151,8 +151,8 @@ export default function Footer() {
                 Politica Cookie-uri
               </Link>
               <span className="text-gray-600 hidden sm:inline">|</span>
-              <Link href="/politica-livrare" className="text-gray-400 hover:text-primary-400 transition-colors">
-                Politica de livrare
+              <Link href="/service-prin-curier" className="text-gray-400 hover:text-primary-400 transition-colors">
+                Service prin curier
               </Link>
               <span className="text-gray-600 hidden sm:inline">|</span>
               <Link href="/politica-retur" className="text-gray-400 hover:text-primary-400 transition-colors">

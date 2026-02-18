@@ -98,9 +98,9 @@ export default function InformatiiLegalePage() {
                 </Link>
               </li>
               <li>
-                <span className="font-semibold text-gray-900">Politica de livrare a comenzii:</span>{' '}
-                <Link href="/politica-livrare" className="text-primary-600 hover:text-primary-700 break-all">
-                  {baseUrl}/politica-livrare
+                <span className="font-semibold text-gray-900">Service prin curier:</span>{' '}
+                <Link href="/service-prin-curier" className="text-primary-600 hover:text-primary-700 break-all">
+                  {baseUrl}/service-prin-curier
                 </Link>
               </li>
               <li>
