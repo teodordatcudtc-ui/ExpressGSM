@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      { source: '/politica-anulare', destination: '/politica-retur', permanent: true },
+    ]
+  },
   images: {
     remotePatterns: [
       {

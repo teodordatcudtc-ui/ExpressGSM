@@ -104,9 +104,15 @@ export default function InformatiiLegalePage() {
                 </Link>
               </li>
               <li>
-                <span className="font-semibold text-gray-900">Politica de anulare a comenzii:</span>{' '}
-                <Link href="/politica-anulare" className="text-primary-600 hover:text-primary-700 break-all">
-                  {baseUrl}/politica-anulare
+                <span className="font-semibold text-gray-900">Politica de retur:</span>{' '}
+                <Link href="/politica-retur" className="text-primary-600 hover:text-primary-700 break-all">
+                  {baseUrl}/politica-retur
+                </Link>
+              </li>
+              <li>
+                <span className="font-semibold text-gray-900">Garanții:</span>{' '}
+                <Link href="/garantii" className="text-primary-600 hover:text-primary-700 break-all">
+                  {baseUrl}/garantii
                 </Link>
               </li>
               <li>

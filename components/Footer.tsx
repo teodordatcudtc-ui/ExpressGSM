@@ -155,8 +155,12 @@ export default function Footer() {
                 Politica de livrare
               </Link>
               <span className="text-gray-600 hidden sm:inline">|</span>
-              <Link href="/politica-anulare" className="text-gray-400 hover:text-primary-400 transition-colors">
-                Politica de anulare
+              <Link href="/politica-retur" className="text-gray-400 hover:text-primary-400 transition-colors">
+                Politica de retur
+              </Link>
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <Link href="/garantii" className="text-gray-400 hover:text-primary-400 transition-colors">
+                Garanții
               </Link>
               <span className="text-gray-600 hidden sm:inline">|</span>
               <Link href="/formular-retur" className="text-gray-400 hover:text-primary-400 transition-colors">
