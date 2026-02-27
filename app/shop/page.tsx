@@ -227,7 +227,34 @@ function ShopContent() {
 
           {/* Categories Filter */}
           <div className="mb-8">
-            <div className="flex flex-wrap gap-3 justify-center mb-4">
+            {/* Mobile: dropdown for main categories */}
+            <div className="md:hidden mb-4">
+              <label htmlFor="shop-category-select" className="block text-sm font-semibold text-gray-700 mb-2">
+                Categorie
+              </label>
+              <select
+                id="shop-category-select"
+                value={selectedCategory ?? ''}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setSelectedCategory(value ? Number(value) : null)
+                  setSelectedSubcategory(null)
+                }}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-600"
+              >
+                <option value="">Toate Categoriile</option>
+                {categories && categories.length > 0 && categories
+                  .filter((c: Category) => !c.parent_id)
+                  .map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Desktop: keep category buttons */}
+            <div className="hidden md:flex flex-wrap gap-3 justify-center mb-4">
               <button
                 onClick={() => {
                   setSelectedCategory(null)
