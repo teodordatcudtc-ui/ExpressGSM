@@ -127,9 +127,17 @@ export default function DatabaseViewPage() {
       })
 
       if (response.ok) {
+        const createdCategory = await response.json()
+        // Show the new row immediately in the categories table, then sync from server.
+        if (activeTable === 'categories' && createdCategory?.id) {
+          setTableData((prev) => {
+            const withoutDuplicate = prev.filter((row) => row.id !== createdCategory.id)
+            return [createdCategory, ...withoutDuplicate]
+          })
+        }
         setShowAddCategoryForm(false)
         setCategoryForm({ name: '', slug: '', description: '', image: '', parent_id: null })
-        fetchTableData(activeTable, true)
+        await fetchTableData(activeTable, true)
         fetchStats()
       } else {
         const error = await response.json()
