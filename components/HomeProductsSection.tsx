@@ -68,7 +68,12 @@ export default function HomeProductsSection() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/categories')
+      const res = await fetch(`/api/categories?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      })
       const data = await res.json()
       setCategories(Array.isArray(data) ? data.filter((c: Category) => !c.parent_id) : [])
     } catch (e) {

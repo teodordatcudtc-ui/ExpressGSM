@@ -29,7 +29,12 @@ export default function HomeCategoriesStrip() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch('/api/categories')
+        const res = await fetch(`/api/categories?_t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        })
         const data = await res.json()
         const list = Array.isArray(data) ? data : []
         const mainOnly = list.filter((c: Category) => !c.parent_id)

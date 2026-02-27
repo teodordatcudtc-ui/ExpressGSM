@@ -8,6 +8,8 @@ const nextConfig = {
     ]
   },
   images: {
+    // Avoid Vercel Image Optimization quota limits by serving original image URLs.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

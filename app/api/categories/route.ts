@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function GET() {
   try {
@@ -25,7 +26,11 @@ export async function GET() {
       return a.name.localeCompare(b.name)
     })
     
-    return NextResponse.json(categoriesWithParent)
+    return NextResponse.json(categoriesWithParent, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
+    })
   } catch (error: any) {
     console.error('Error fetching categories:', error)
     return NextResponse.json({ error: 'Failed to fetch categories', details: error.message }, { status: 500 })
