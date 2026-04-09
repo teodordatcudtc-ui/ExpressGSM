@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { ensureAdminRequest } from '@/lib/adminAuth'
 
 export async function GET(request: Request) {
   try {
@@ -21,13 +22,18 @@ export async function GET(request: Request) {
     const active = searchParams.get('active') !== 'false'
     const includeSubcategories = searchParams.get('includeSubcategories') === 'true'
     const includeOutOfStock = searchParams.get('includeOutOfStock') === 'true'
+    const brief = searchParams.get('brief') === 'true'
+    const parsedLimit = Number.parseInt(searchParams.get('limit') || '', 10)
+    const hasLimit = Number.isFinite(parsedLimit) && parsedLimit > 0
+    const limit = hasLimit ? Math.min(parsedLimit, 60) : null
 
     let query = supabase
       .from('products')
-      .select(`
-        *,
-        categories (*)
-      `)
+      .select(
+        brief
+          ? 'id,name,slug,description,price,discount,discount_type,price_reduced,image,images,category_id,stock,active,created_at,categories(name,slug,parent_id)'
+          : '*,categories(name,slug,parent_id)'
+      )
 
     if (slug) {
       query = query.eq('slug', slug)
@@ -56,6 +62,9 @@ export async function GET(request: Request) {
     }
 
     query = query.order('created_at', { ascending: false })
+    if (limit) {
+      query = query.limit(limit)
+    }
 
     const { data, error } = await query
 
@@ -76,7 +85,11 @@ export async function GET(request: Request) {
       }
     })
 
-    return NextResponse.json(products)
+    return NextResponse.json(products, {
+      headers: {
+        'Cache-Control': 'public, max-age=60, s-maxage=180, stale-while-revalidate=300',
+      },
+    })
   } catch (error: any) {
     console.error('Error fetching products:', error)
     return NextResponse.json({ error: 'Failed to fetch products', details: error.message }, { status: 500 })
@@ -85,6 +98,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     const body = await request.json()
     const { name, slug, description, price, discount, discount_type, price_reduced, image, images, category_id, stock, active } = body
 

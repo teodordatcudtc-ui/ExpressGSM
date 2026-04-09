@@ -72,7 +72,7 @@ export default function ProductCarousel() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products?active=true')
+      const res = await fetch('/api/products?active=true&brief=true&limit=15')
       const data = await res.json()
       // Get only active products with images, limit to 15 for performance
       const activeProducts = (Array.isArray(data) ? data : [])

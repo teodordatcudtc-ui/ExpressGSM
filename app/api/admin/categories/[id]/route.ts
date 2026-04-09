@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
+import { ensureAdminRequest } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     // Check if category is used in products
     const products = await db.getWhere('products', { category_id: parseInt(params.id) })
     

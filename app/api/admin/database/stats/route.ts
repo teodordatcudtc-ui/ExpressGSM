@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { isSupabaseConfigured } from '@/lib/supabase'
+import { ensureAdminRequest } from '@/lib/adminAuth'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     if (!isSupabaseConfigured()) {
       return NextResponse.json({
         categories: 0,

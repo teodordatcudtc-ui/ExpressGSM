@@ -58,7 +58,8 @@ npm install --production
 
 Creează `.env.local` pe server:
 ```env
-NEXT_PUBLIC_ADMIN_PASSWORD=parola_ta_secreta
+ADMIN_PASSWORD=parola_ta_foarte_lunga_si_unica
+ADMIN_AUTH_SECRET=secret_lung_random_minim_32_caractere
 NODE_ENV=production
 ```
 

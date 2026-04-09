@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { isSupabaseConfigured } from '@/lib/supabase'
+import { ensureAdminRequest } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -9,6 +10,9 @@ const allowedTables = ['categories', 'products', 'orders', 'order_items']
 
 export async function GET(request: NextRequest) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     if (!isSupabaseConfigured()) {
       return NextResponse.json([], {
         headers: {

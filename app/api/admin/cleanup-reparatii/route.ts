@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
+import { ensureAdminRequest } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     const categories = await db.getWhere('categories', { slug: 'reparatii' })
     
     if (categories.length === 0) {

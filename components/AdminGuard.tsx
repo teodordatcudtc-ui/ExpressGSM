@@ -8,16 +8,20 @@ import { FiLock } from 'react-icons/fi'
 
 export default function AdminGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, checkSession } = useAuthStore()
   const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/admin/login')
-    } else {
+    const runCheck = async () => {
+      const authenticated = await checkSession()
+      if (!authenticated) {
+        router.push('/admin/login')
+        return
+      }
       setIsChecking(false)
     }
-  }, [isAuthenticated, router])
+    runCheck()
+  }, [checkSession, router])
 
   if (isChecking || !isAuthenticated) {
     return (

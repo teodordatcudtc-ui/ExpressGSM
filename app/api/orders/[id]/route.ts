@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
+import { ensureAdminRequest } from '@/lib/adminAuth'
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     const order = (await db.getById('orders', parseInt(params.id))) as any
     
     if (!order) {
@@ -20,6 +24,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     const body = await request.json()
     const { status, payment_status } = body
 

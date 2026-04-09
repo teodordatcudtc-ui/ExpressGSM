@@ -11,13 +11,17 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { isAuthenticated, login } = useAuthStore()
+  const { isAuthenticated, login, checkSession } = useAuthStore()
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/admin')
+    const runCheck = async () => {
+      const authenticated = await checkSession()
+      if (authenticated || isAuthenticated) {
+        router.push('/admin')
+      }
     }
-  }, [isAuthenticated, router])
+    runCheck()
+  }, [checkSession, isAuthenticated, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

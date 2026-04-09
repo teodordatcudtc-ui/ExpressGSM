@@ -77,10 +77,10 @@ function ShopContent() {
     
     document.addEventListener('visibilitychange', handleVisibilityChange)
     
-    // Also refresh categories periodically (every 5 seconds) to catch changes quickly
+    // Keep categories fresh while reducing repeated requests.
     const interval = setInterval(() => {
       fetchCategories()
-    }, 5000)
+    }, 300000)
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
@@ -135,13 +135,7 @@ function ShopContent() {
 
   const fetchCategories = async () => {
     try {
-      // Add cache-busting to prevent browser cache
-      const res = await fetch(`/api/categories?_t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      })
+      const res = await fetch('/api/categories')
       const data = await res.json()
       setCategories(data)
     } catch (error) {

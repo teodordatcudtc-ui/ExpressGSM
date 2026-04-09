@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { isSupabaseConfigured } from '@/lib/supabase'
+import { ensureAdminRequest } from '@/lib/adminAuth'
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     // Check if Supabase is configured
     if (!isSupabaseConfigured()) {
       return NextResponse.json(

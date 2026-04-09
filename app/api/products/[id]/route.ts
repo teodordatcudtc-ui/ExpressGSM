@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { ensureAdminRequest } from '@/lib/adminAuth'
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -49,6 +50,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     const body = await request.json()
     const { name, slug, description, price, discount, discount_type, price_reduced, image, images, category_id, stock, active } = body
 
@@ -95,6 +99,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     // Check if product is used in orders
     const orderItems = await db.getWhere('order_items', { product_id: parseInt(params.id) })
     

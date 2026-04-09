@@ -346,8 +346,8 @@ function AdminDashboardContent() {
               <span className="sm:hidden">Baza de Date</span>
             </Link>
             <button
-              onClick={() => {
-                logout()
+              onClick={async () => {
+                await logout()
                 window.location.href = '/admin/login'
               }}
               className="flex items-center justify-center gap-2 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold transition-colors text-sm sm:text-base"

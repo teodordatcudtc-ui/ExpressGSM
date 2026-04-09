@@ -68,12 +68,7 @@ export default function HomeProductsSection() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch(`/api/categories?_t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      })
+      const res = await fetch('/api/categories')
       const data = await res.json()
       setCategories(Array.isArray(data) ? data.filter((c: Category) => !c.parent_id) : [])
     } catch (e) {
@@ -85,12 +80,11 @@ export default function HomeProductsSection() {
     try {
       setLoading(true)
       const url = categoryFilter
-        ? `/api/products?categoryId=${categoryFilter}&active=true&includeSubcategories=true`
-        : '/api/products?active=true'
+        ? `/api/products?categoryId=${categoryFilter}&active=true&includeSubcategories=true&brief=true&limit=8`
+        : '/api/products?active=true&brief=true&limit=8'
       const res = await fetch(url)
       const data = await res.json()
       let list = Array.isArray(data) ? data.filter((p: Product) => p.image) : []
-      list = list.slice(0, 8)
       setProducts(list)
     } catch (e) {
       console.error(e)

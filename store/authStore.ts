@@ -1,33 +1,43 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 
 interface AuthStore {
   isAuthenticated: boolean
   login: (password: string) => Promise<boolean>
-  logout: () => void
+  logout: () => Promise<void>
+  checkSession: () => Promise<boolean>
 }
 
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123'
-
 export const useAuthStore = create<AuthStore>()(
-  persist(
-    (set) => ({
-      isAuthenticated: false,
-      login: async (password: string) => {
-        // In production, you should hash and compare passwords properly
-        if (password === ADMIN_PASSWORD) {
-          set({ isAuthenticated: true })
-          return true
-        }
-        return false
-      },
-      logout: () => {
+  (set) => ({
+    isAuthenticated: false,
+    login: async (password: string) => {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
+      if (!response.ok) {
         set({ isAuthenticated: false })
-      },
-    }),
-    {
-      name: 'auth-storage',
-    }
-  )
+        return false
+      }
+      set({ isAuthenticated: true })
+      return true
+    },
+    logout: async () => {
+      await fetch('/api/admin/logout', { method: 'POST' })
+      set({ isAuthenticated: false })
+    },
+    checkSession: async () => {
+      const response = await fetch('/api/admin/session', { method: 'GET' })
+      if (!response.ok) {
+        set({ isAuthenticated: false })
+        return false
+      }
+      const data = await response.json()
+      const authenticated = Boolean(data?.isAuthenticated)
+      set({ isAuthenticated: authenticated })
+      return authenticated
+    },
+  })
 )
 

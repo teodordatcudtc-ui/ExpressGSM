@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import db from '@/lib/db'
+import { ensureAdminRequest } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
   try {
+    const unauthorized = ensureAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     const body = await request.json()
     const { name, slug, description, image, parent_id } = body
 

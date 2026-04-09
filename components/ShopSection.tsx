@@ -50,10 +50,10 @@ export default function ShopSection() {
     
     document.addEventListener('visibilitychange', handleVisibilityChange)
     
-    // Also refresh categories periodically (every 5 seconds) to catch changes quickly
+    // Keep categories reasonably fresh without hammering the API.
     const interval = setInterval(() => {
       fetchCategories()
-    }, 5000)
+    }, 300000)
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
@@ -164,13 +164,7 @@ export default function ShopSection() {
 
   const fetchCategories = async () => {
     try {
-      // Add cache-busting to prevent browser cache
-      const res = await fetch(`/api/categories?_t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      })
+      const res = await fetch('/api/categories')
       const data = await res.json()
       // Get only main categories (no parent) and limit to 4 for buttons
       const mainCategories = (Array.isArray(data) ? data : [])
@@ -195,14 +189,13 @@ export default function ShopSection() {
     try {
       setLoading(true)
       const url = categoryId
-        ? `/api/products?categoryId=${categoryId}&active=true&includeSubcategories=true`
-        : '/api/products?active=true'
+        ? `/api/products?categoryId=${categoryId}&active=true&includeSubcategories=true&brief=true&limit=20`
+        : '/api/products?active=true&brief=true&limit=20'
       const res = await fetch(url)
       const data = await res.json()
       // Get only active products with images
       const activeProducts = (Array.isArray(data) ? data : [])
         .filter((p: Product) => p.image)
-        .slice(0, 20) // Limit to 20 products for performance
       
       // Duplicate for seamless infinite loop
       setProducts([...activeProducts, ...activeProducts])

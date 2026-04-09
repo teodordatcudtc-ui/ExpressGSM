@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { sendOrderConfirmationEmail, sendOrderNotificationToOwner } from '@/lib/email'
+import { ensureAdminRequest } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,6 +9,11 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
+
+    if (!userId) {
+      const unauthorized = ensureAdminRequest(request)
+      if (unauthorized) return unauthorized
+    }
 
     let orders
     if (userId) {
