@@ -2,7 +2,7 @@ import { create } from 'zustand'
 
 interface AuthStore {
   isAuthenticated: boolean
-  login: (password: string) => Promise<boolean>
+  login: (password: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
   checkSession: () => Promise<boolean>
 }
@@ -18,10 +18,27 @@ export const useAuthStore = create<AuthStore>()(
       })
       if (!response.ok) {
         set({ isAuthenticated: false })
-        return false
+        let message = 'Parolă incorectă'
+        try {
+          const data = await response.json()
+          if (typeof data?.error === 'string' && data.error.trim()) {
+            message = data.error
+          }
+        } catch {
+          // Ignore parse errors and keep fallback message
+        }
+        if (response.status === 429) {
+          const retryAfter = response.headers.get('Retry-After')
+          const retrySeconds = retryAfter ? Number.parseInt(retryAfter, 10) : NaN
+          if (Number.isFinite(retrySeconds) && retrySeconds > 0) {
+            const retryMinutes = Math.ceil(retrySeconds / 60)
+            message = `Prea multe încercări. Încearcă din nou în aproximativ ${retryMinutes} minute.`
+          }
+        }
+        return { success: false, error: message }
       }
       set({ isAuthenticated: true })
-      return true
+      return { success: true }
     },
     logout: async () => {
       await fetch('/api/admin/logout', { method: 'POST' })

@@ -29,11 +29,11 @@ export default function AdminLoginPage() {
     setIsLoading(true)
 
     try {
-      const success = await login(password)
-      if (success) {
+      const result = await login(password)
+      if (result.success) {
         router.push('/admin')
       } else {
-        setError('Parolă incorectă')
+        setError(result.error || 'Parolă incorectă')
       }
     } catch (err) {
       setError('Eroare la autentificare')
