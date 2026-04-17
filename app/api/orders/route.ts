@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
-import { sendOrderConfirmationEmail, sendOrderNotificationToOwner } from '@/lib/email'
+import { sendOrderNotificationToOwner } from '@/lib/email'
 import { ensureAdminRequest } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
@@ -124,15 +124,11 @@ export async function POST(request: Request) {
       paymentStatus: order.payment_status || 'pending',
     }
 
-    // Notificare către proprietar (ecranul@yahoo.com) – mereu
-    sendOrderNotificationToOwner(emailPayload).catch((error) => {
-      console.error('Failed to send owner notification:', error)
-    })
-    // Confirmare către client – doar pentru ramburs; pentru card_online se trimite după confirmarea plății (IPN)
-    if (payment !== 'card_online') {
-      sendOrderConfirmationEmail(emailPayload).catch((error) => {
-        console.error('Failed to send confirmation email:', error)
-      })
+    // Notificare owner – await pe serverless (Vercel), altfel procesul se poate închide înainte de sendMail
+    try {
+      await sendOrderNotificationToOwner(emailPayload)
+    } catch (e) {
+      console.error('Failed to send owner notification:', e)
     }
 
     return NextResponse.json({ ...order, items: orderItems }, { status: 201 })

@@ -93,11 +93,15 @@ export async function POST(request: Request) {
     if (isConfirmed) {
       await db.update('orders', order.id, { payment_status: 'platita' })
       const { sendPaymentConfirmedEmails } = await import('@/lib/email')
-      sendPaymentConfirmedEmails({
-        orderNumber: order.order_number,
-        customerName: order.customer_name,
-        customerEmail: order.customer_email,
-      }).catch((err) => console.error('Payment confirmed email error:', err))
+      try {
+        await sendPaymentConfirmedEmails({
+          orderNumber: order.order_number,
+          customerName: order.customer_name,
+          customerEmail: order.customer_email,
+        })
+      } catch (err) {
+        console.error('Payment confirmed email error:', err)
+      }
       return new NextResponse(
         buildConfirmResponseXml(0, 'OK'),
         { status: 200, headers: { 'Content-Type': 'application/xml' } }

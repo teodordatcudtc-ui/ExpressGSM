@@ -48,12 +48,14 @@ export async function POST(request: Request) {
 
     try {
       const { sendPaymentConfirmedEmails } = await import('@/lib/email')
-      sendPaymentConfirmedEmails({
+      await sendPaymentConfirmedEmails({
         orderNumber: order.order_number,
         customerName: order.customer_name,
         customerEmail: order.customer_email,
-      }).catch(() => {})
-    } catch (_) {}
+      })
+    } catch (e) {
+      console.error('Payment confirmed email error:', e)
+    }
 
     return NextResponse.json({ ok: true, message: 'Plată confirmată' })
   } catch (error: any) {

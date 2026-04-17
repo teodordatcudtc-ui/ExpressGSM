@@ -45,21 +45,49 @@ function paymentStatusLabel(value?: string): string {
   return value ? String(value) : '—'
 }
 
-// Create SMTP transporter
+// Create SMTP transporter (Gmail: parola de aplicație fără spații; pe Vercel trebuie await la send înainte de răspuns)
 function createTransporter() {
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  const host = process.env.SMTP_HOST?.trim()
+  const user = process.env.SMTP_USER?.trim()
+  const pass = process.env.SMTP_PASS?.replace(/\s+/g, '')
+
+  if (!host || !user || !pass) {
+    console.warn('[email] SMTP incomplet (lipsește HOST / USER / PASS):', {
+      SMTP_HOST: Boolean(host),
+      SMTP_USER: Boolean(user),
+      SMTP_PASS: Boolean(pass),
+    })
     return null
   }
 
+  const auth = { user, pass }
+  const connectionTimeout = 25_000
+
+  if (host === 'smtp.gmail.com') {
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth,
+      connectionTimeout,
+    })
+  }
+
+  const port = parseInt(process.env.SMTP_PORT || '587', 10)
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
+    host,
+    port,
+    secure: port === 465,
+    auth,
+    connectionTimeout,
+    ...(port === 587 ? { requireTLS: true } : {}),
   })
+}
+
+function logSmtpError(context: string, error: unknown): void {
+  const e = error as { message?: string; response?: string; responseCode?: number; command?: string }
+  console.error(`[email] ${context}:`, e?.message || error)
+  if (e?.responseCode != null || e?.response) {
+    console.error('[email] SMTP response:', e.responseCode, e.response?.slice?.(0, 500))
+  }
 }
 
 // Generate HTML email template (forOwner = true includează "Status plată")
@@ -241,76 +269,12 @@ Data: ${data.orderDate}
     })
     console.log(`✅ Notificare comandă trimisă către ${OWNER_EMAIL}`)
   } catch (error: any) {
-    console.error('❌ Eroare trimitere notificare owner:', error)
+    logSmtpError('Eroare trimitere notificare owner', error)
     throw error
   }
 }
 
-// Send order confirmation email via SMTP (doar către client, dacă a furnizat email)
-export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<void> {
-  if (!data.customerEmail || !data.customerEmail.trim()) {
-    return // client fără email – nu trimitem confirmare
-  }
-  const transporter = createTransporter()
-
-  if (!transporter) {
-    console.log('📧 Email would be sent (SMTP not configured):', {
-      to: data.customerEmail,
-      subject: `Confirmare Comandă ${data.orderNumber}`,
-    })
-    return
-  }
-
-  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || BUSINESS_FROM
-
-  try {
-    const info = await transporter.sendMail({
-      from: `"ecranul.ro" <${fromEmail}>`,
-      to: data.customerEmail,
-      subject: `Confirmare Comandă ${data.orderNumber} - ecranul.ro`,
-      html: generateOrderEmailHTML(data),
-      text: `
-Confirmare Comandă - ecranul.ro
-
-Bună ziua, ${data.customerName}!
-
-Mulțumim pentru comanda ta! Am primit comanda cu numărul ${data.orderNumber} și o vom procesa în cel mai scurt timp.
-
-Detalii Comandă:
-- Număr comandă: ${data.orderNumber}
-- Data: ${data.orderDate}
-- Telefon: ${data.customerPhone}
-- Adresă: ${data.customerAddress}
-- Metodă livrare: ${deliveryMethodLabel(data.deliveryMethod)}
-- Metodă plată: ${paymentMethodLabel(data.paymentMethod)}
-
-Produse comandate:
-${data.items.map(item => `- ${item.product_name} x${item.quantity} = ${(item.price * item.quantity).toFixed(2)} RON`).join('\n')}
-
-Total: ${data.totalAmount.toFixed(2)} RON
-
-${(data.paymentStatus === 'platita' || data.paymentStatus === 'paid')
-  ? 'Plata a fost confirmată. Vei fi contactat în curând pentru detalii despre livrare.'
-  : data.paymentMethod === 'card_online'
-    ? 'Plata cu cardul va fi confirmată după finalizarea tranzacției. Vei fi contactat în curând.'
-    : 'Notă: Plata se va efectua la livrare (ramburs). Vei fi contactat în curând pentru confirmarea comenzii și detalii despre livrare.'}
-
-Dacă ai întrebări, te rugăm să ne contactezi la ecranul@yahoo.com
-
-ecranul.ro
-București, Strada Pajurei 7
-      `.trim(),
-    })
-
-    console.log(`✅ Order confirmation email sent to ${data.customerEmail} via SMTP`)
-    console.log(`📧 Message ID: ${info.messageId}`)
-  } catch (error: any) {
-    console.error('❌ Failed to send email via SMTP:', error)
-    throw error
-  }
-}
-
-/** Trimite scurt "Plata confirmată" către client (dacă are email) și către proprietar */
+/** Notificare proprietar: plată card confirmată (Netopia IPN). Nu se trimite email către client. */
 export async function sendPaymentConfirmedEmails(params: {
   orderNumber: string
   customerName: string
@@ -318,39 +282,37 @@ export async function sendPaymentConfirmedEmails(params: {
 }): Promise<void> {
   const transporter = createTransporter()
   if (!transporter) {
-    console.log('📧 Payment confirmed emails skipped (SMTP not configured)')
+    console.log('Payment confirmed notification skipped (SMTP not configured)')
     return
   }
   const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || BUSINESS_FROM
-  const msg = `Plata pentru comanda ${params.orderNumber} a fost confirmată. Mulțumim!`
-  const html = `
-    <p>Bună ziua, ${params.customerName}!</p>
-    <p><strong>Plata pentru comanda ${params.orderNumber} a fost confirmată.</strong></p>
-    <p>Mulțumim! Vei fi contactat în curând pentru detalii despre livrare.</p>
+  const emailLine = params.customerEmail?.trim()
+    ? `Email client: ${params.customerEmail.trim()}`
+    : 'Email client: —'
+  const text = [
+    '[Proprietar] Plată confirmată (card online)',
+    `Comandă: ${params.orderNumber}`,
+    `Client: ${params.customerName}`,
+    emailLine,
+  ].join('\n')
+  const html = `<div style="font-family: sans-serif;">
+    <p><strong>Plată confirmată</strong> (plată cu cardul)</p>
+    <p>Comandă: <strong>${params.orderNumber}</strong></p>
+    <p>Client: ${params.customerName}</p>
+    <p>${emailLine}</p>
     <p>— ecranul.ro</p>
-  `
+  </div>`
   try {
     await transporter.sendMail({
       from: `"ecranul.ro" <${fromEmail}>`,
       to: OWNER_EMAIL,
-      subject: `✅ Plată confirmată – Comandă ${params.orderNumber}`,
-      text: `[Proprietar] ${msg}`,
-      html: `<div style="font-family: sans-serif;">${html}</div>`,
+      subject: `Plată confirmată – Comandă ${params.orderNumber}`,
+      text,
+      html,
     })
-    if (params.customerEmail && params.customerEmail.trim()) {
-      await transporter.sendMail({
-        from: `"ecranul.ro" <${fromEmail}>`,
-        to: params.customerEmail.trim(),
-        subject: `Plata confirmată – Comandă ${params.orderNumber} - ecranul.ro`,
-        text: msg,
-        html: `<div style="font-family: sans-serif;">${html}</div>`,
-      })
-    }
-    console.log('✅ Payment confirmed emails sent')
+    console.log(`Payment confirmed notification sent to owner (${OWNER_EMAIL})`)
   } catch (error: any) {
-    console.error('❌ sendPaymentConfirmedEmails:', error)
+    logSmtpError('sendPaymentConfirmedEmails', error)
     throw error
   }
 }
-
-export default sendOrderConfirmationEmail
